@@ -41,7 +41,8 @@ This README is the project ledger. Update the milestone checkboxes and progress 
 - Favorites, ratings, photos, and a wish list remain planned.
 - Rich daily/time/venue/category charts, cross-sailing history, and cruise recap cards.
 - Optional package scenarios for travelers without a package and more detailed venue-specific coverage rules. Billed days, gratuity settings, other fees, bundled-extra allocations, and a simple per-drink cap are implemented.
-- More currencies, accessible filtering, improved onboarding, and install guidance.
+- More currencies, accessible filtering, and improved onboarding.
+- [x] Device-specific install guidance and browser-native installation when available.
 - [x] Source-linked, dated community catalog snapshots with local price precedence.
 - [x] Editable drink descriptions with reviewed ingredient references, offline display, and ingredient search.
 - Expand menu coverage and add a community correction/import workflow; investigate menu photo/OCR feasibility.
@@ -192,7 +193,7 @@ npm run preview
 npm run test:browser
 ```
 
-Use Node 22.18+ or a newer supported LTS version; this setup was validated on Node 26.8. Browser acceptance tests use an installed Google Chrome via Playwright. `npm run dev` is for development; test offline behavior with the production build served by `npm run preview`. The app must load online once to cache its files. Before relying on it offline, wait for “Ready for offline”, reload once, then test logging and reloading with networking disabled. HTTPS (or localhost for development) is required for service workers.
+Use Node 22.18+ or a newer supported LTS version; this setup was validated on Node 26.8. Browser acceptance tests use an installed Google Chrome via Playwright. `npm run dev` is for development; test offline behavior with the production build served by `npm run preview`. The app must load online once to cache its files. Before relying on it offline, allow the first load to finish, reload once, then test logging and reloading with networking disabled. HTTPS (or localhost for development) is required for service workers.
 
 ## Data and package calculations
 
@@ -224,3 +225,65 @@ Native integration should sit behind capability adapters when introduced; the UI
 ## Implementation references
 
 [Vite setup](https://vite.dev/guide/), [PWA precaching](https://vite-pwa-org.netlify.app/guide/service-worker-precache), and [IndexedDB transactions](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB).
+
+
+### 2026-11-14 — Mobile experience and modern nautical styling
+
+- Added navy, sea-glass, cream, and coral surfaces with a reusable ship illustration, an anchor identity, and subtle nautical trim. Ship/wave, navigation, sheet, and save-feedback animations are brief and disabled when reduced motion is preferred. Artwork remains available offline.
+- Improved phone typography and contrast, shortened visible navigation labels while preserving accessible names, and added safe-area-aware bottom navigation with an always-reachable Log a drink action. Navigation returns each page to the top.
+- Phone editors use bottom sheets, single-column fields with 16px input text, sticky headings/save actions, and larger touch targets. Opening a dialog focuses its heading and locks background scrolling; closing it restores the previous page position.
+- Reflowed journal actions, crew cards, filters, and package breakdowns to avoid cramped controls and horizontal page overflow.
+- Validation: production build and 35 domain/storage tests passed; nine existing browser scenarios plus two new mobile scenarios passed. New coverage checks 320px and 390px phones, a short 667px landscape view, dialog focus and scroll restoration, navigation touch targets, and reduced motion. Physical iPhone/Safari keyboard behavior and home-screen safe areas still need device verification.
+
+
+### 2026-11-14 — Brighter brand, Skipper mascot, and save celebrations
+
+- Replaced the muted palette with cobalt, aqua, tangerine, lemon, and lilac; added a bolder rounded wordmark and a wave/drink logo, including refreshed favicon and install icons.
+- Created Skipper, an original octopus captain mascot, with the built-in image-generation tool. The transparent, locally bundled artwork appears on onboarding and the sailing card, floats with the ocean accent, and responds to taps. [Brand assets and the exact generation prompt](docs/brand.md) are documented.
+- New drinks and explicit repeats trigger a short mascot confirmation and bubble/confetti burst only after a successful save. Edits use a plain confirmation; failed writes retain the draft without celebrations. Feedback can be dismissed and clears automatically or when another editor opens.
+- Added a persistent pause control for ambient motion. System reduced-motion preferences suppress motion while retaining readable save feedback.
+- Validation: production build, 35 domain/storage tests, 11 existing browser scenarios, and three new celebration scenarios passed. Verified offline artwork, successful and failed writes, repeat/edit distinctions, dismiss/reopen behavior, persistent motion preferences, and reduced-motion feedback. Physical iPhone/Safari checks remain outstanding.
+
+### 2026-11-14 — Individual sailor characters and daily reactions
+
+- Removed the in-app animation pause control and its saved preference. System reduced-motion settings still suppress movement while preserving expressions and save feedback.
+- Added six assignable sailor characters: Skipper, Sunny, Pip, Finn, Clawdia, and Pearl. Each has four illustrated expressions with brief, distinct reactions instead of continuous hovering. [Artwork and generation prompts](docs/character-art.md) are included.
+- The overview and crew views show reactions for each sailor on the selected sailing day. Any log brings a smile; three alcohol-category logs show a merry expression; five show a woozy character taking a water break. These are playful daily reactions, not an intoxication estimate. Corrections and deletions recalculate immediately; other sailors and dates remain independent.
+- Save feedback uses the logging sailor's character and current expression. Character assignments persist offline and in version 6 backups; older backups remain supported with stable default characters.
+- Validation: production build, 39 unit tests, and 16 browser scenarios passed. New coverage checks independent assignments, all six offline assets, reload/backup restoration, date isolation, save reactions, and deletion recalculation. Mobile screenshots were inspected at 390px; existing 320px and landscape coverage also passed. Physical iPhone/Safari checks remain outstanding.
+
+### 2026-11-14 — Hamburger navigation and contextual logging
+
+- Replaced the sidebar/bottom navigation with a hamburger menu at every screen size. Home and Log a drink are prominent shortcuts, followed by the journal sections and backups. The sticky header keeps the menu and home wordmark available while scrolling.
+- Removed the “Ready for offline” header label. The offline indicator still appears when disconnected; caching and local storage are unchanged.
+- The standalone Log a drink button now appears only on Overview and Drink log. Passport, Menus, and Crew remain uncluttered, with logging available through the menu.
+- The menu uses the native modal dialog, with phone bottom-sheet styling, Escape/backdrop dismissal, scroll locking/restoration, and explicit return of keyboard focus to the opener.
+- Validation: production build and all 16 browser scenarios passed across the full run and focused rerun after the focus fix. Navigation checks cover 320px and 390px phones, 667px landscape, and 1280px desktop, including contextual buttons, home navigation, menu-to-log transitions, focus, scroll restoration, and reduced motion. Phone screenshots were visually reviewed. Physical iPhone/Safari checks remain outstanding.
+
+### 2026-11-14 — Draggable mobile navigation sheet
+
+- Replaced the menu’s decorative handle with a 44px interactive grip. Pull up to expand; pull down to collapse an expanded menu or dismiss a compact one. Movement follows the pointer, and small/cancelled drags snap back.
+- Added tap and arrow-key alternatives, pointer capture, resize reset, and reduced-motion support. The grip remains separate from a scrollable menu-content area, keeping it reachable in short landscape views. Other editor dialogs retain their existing behavior.
+- Validation: production build, two touch-gesture browser scenarios, and both existing mobile scenarios passed. Coverage includes live drag geometry, snapping, cancellation, dismissal, native touch scrolling in landscape, keyboard/tap controls, rotation, desktop handle hiding, and focus/scroll restoration. Tested in Chrome phone emulation; physical iPhone/Safari verification remains outstanding.
+
+### 2026-11-14 — Cleaner navigation and PWA installation help
+
+- Removed the redundant header gear and the hamburger-menu tagline. Backups & exports remains in the menu.
+- Added Install SipAhoy with selectable iPhone/iPad, Android, Chrome desktop, and Safari Mac instructions, linked to official browser documentation. Compatible browsers can offer an Install now action backed by their native installation prompt; other browsers retain manual instructions.
+- Suppressed the menu entry in detected app display modes, iOS standalone mode, and after an appinstalled event. A normal browser tab cannot universally detect a separately installed app, so installation state is not permanently guessed or saved.
+- Validation: production build and all 22 browser scenarios passed, including prompt acceptance/dismissal/error simulations, installed-state hiding, menu backup access, and 320px install-guide layouts. Phone screenshots were visually reviewed. Automated checks do not perform a real OS installation; physical-device installation remains to be verified.
+
+### 2026-11-14 — Right-aligned wordmark
+
+- Moved the SipAhoy home wordmark to the right side of the header and removed the glass icon from that wordmark. The hamburger remains on the left.
+- Retained the glass icon assets for PWA installation, the install guide, and the favicon.
+- Validation: production build and both existing mobile browser scenarios passed; the 390px header screenshot was visually reviewed.
+
+### 2026-11-14 — Deliberate menu dismissal
+
+- Disabled backdrop and sheet-padding tap dismissal for navigation, preventing accidental closes near the grip. X and keyboard Escape remain available.
+- Downward dragging moves the whole menu. Releasing below one-third of its starting height snaps back; reaching that distance slides it fully off-screen before closing, from either compact or expanded size. Flick speed does not bypass the threshold, and cancelled gestures never dismiss.
+- Exit completion uses the transform transition with a cleanup-safe fallback; reduced motion closes immediately. Other editor dialogs retain their existing dismissal behavior.
+- Validation: production build, both gesture scenarios, and both existing mobile scenarios passed. Checked surrounding taps, fast pulls just below the threshold, cancellation, compact/expanded dismissal, animated exit, native content scrolling, focus/scroll restoration, and reduced motion in browser emulation.
+
+The sailing picker now uses ship artwork cards with full trip dates and a clear current selection. All 31 supported ships have locally cached official photography or renderings, also shown in sailing setup and Sailing & crew. See [ship artwork sources and maintenance](docs/ship-artwork.md).

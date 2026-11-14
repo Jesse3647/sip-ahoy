@@ -93,7 +93,7 @@ describe("drink descriptions and journal compatibility", () => {
       item.description,
     );
     const exported = JSON.parse(backup(data));
-    expect(exported.version).toBe(5);
+    expect(exported.version).toBe(6);
     expect(importBackup(JSON.stringify(exported))).toEqual(data);
     item.description = "x".repeat(501);
     expect(dataSchema.safeParse(data).success).toBe(false);

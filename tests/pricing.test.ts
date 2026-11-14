@@ -170,7 +170,7 @@ describe("package and bundle accounting", () => {
       ],
     };
     const text = backup(d);
-    expect(JSON.parse(text).version).toBe(5);
+    expect(JSON.parse(text).version).toBe(6);
     expect(importBackup(text)).toEqual(d);
   });
   it("validates user input and does not confuse exact gratuities with daily amounts", () => {

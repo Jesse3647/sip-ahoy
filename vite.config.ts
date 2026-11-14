@@ -12,8 +12,8 @@ export default defineConfig({
         name: "SipAhoy — Your cruise drink journal",
         short_name: "SipAhoy",
         description: "Offline cruise drink tracking and package comparisons.",
-        theme_color: "#123d46",
-        background_color: "#f7f7f2",
+        theme_color: "#3156f5",
+        background_color: "#f5f6ff",
         display: "standalone",
         start_url: ".",
         icons: [
@@ -28,7 +28,7 @@ export default defineConfig({
       },
       // Bundled menus ship inside the JavaScript cache; runtime source-site requests are unnecessary.
       workbox: {
-        globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
+        globPatterns: ["**/*.{js,css,html,svg,png,webp,woff2}"],
         navigateFallback: "index.html",
       },
     }),

@@ -1,18 +1,24 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Anchor,
   ArrowDownToLine,
   ArrowRight,
   BookOpen,
   Check,
-  ChevronDown,
   CircleHelp,
   Compass,
   LayoutDashboard,
   Martini,
+  Menu,
   Plus,
   Search,
-  Settings,
+  Download,
   Ship,
   Trash2,
   Users,
@@ -36,6 +42,8 @@ import {
   type Traveler,
 } from "./model";
 import { read, write, type Snapshot } from "./storage";
+import { SailingPicker } from "./components/SailingPicker";
+import { ShipArtwork, ShipArtworkCredit } from "./components/ShipArtwork";
 import { SailingForm } from "./forms/SailingForm";
 import { TravelerForm } from "./forms/TravelerForm";
 import { LogForm } from "./forms/LogForm";
@@ -44,8 +52,23 @@ import { BackupForm } from "./forms/BackupForm";
 import { ModalShell, Stat, SectionTitle, Empty } from "./components/ui";
 import { LogRow, PackageCards } from "./components/JournalSummary";
 import { drinkIcon } from "./components/DrinkIcon";
-import { dateLabel } from "./formatting";
+import { dateLabel, localDate } from "./formatting";
 import { DrinkDescription } from "./components/DrinkDescription";
+import { useInstallApp } from "./useInstallApp";
+import { InstallGuide } from "./components/InstallGuide";
+import { Brand } from "./components/Brand";
+import { Skipper } from "./components/Skipper";
+import { SaveCelebration } from "./components/SaveCelebration";
+import {
+  characterFor,
+  characterIds,
+  moods,
+  sailorReaction,
+  type CharacterId,
+  type CharacterMood,
+} from "./characters";
+import { CharacterPortrait } from "./components/CharacterPortrait";
+import { CrewReactions, ReactionDay } from "./components/CrewReactions";
 /** Available journal views; navigation state is local to this browser session. */
 type Page =
   | "Overview"
@@ -60,6 +83,7 @@ type Modal =
   | { type: "log"; entry?: Entry; repeat?: Entry }
   | { type: "drink"; drink?: Drink }
   | { type: "backup" }
+  | { type: "install" }
   | null;
 const icons: Record<Page, typeof Anchor> = {
   Overview: LayoutDashboard,
@@ -70,6 +94,7 @@ const icons: Record<Page, typeof Anchor> = {
 };
 /** Coordinates journal loading/saving, sailing-scoped views, navigation, and editor lifecycles. */
 export default function App() {
+  const installation = useInstallApp();
   const [snapshot, setSnapshot] = useState<Snapshot>({
     revision: 0,
     data: emptyData(),
@@ -79,12 +104,32 @@ export default function App() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [page, setPage] = useState<Page>("Overview");
+  const [menuOpen, setMenuOpen] = useState(false);
   const [modal, setModal] = useState<Modal>(null);
   const [notice, setNotice] = useState("");
+  const [celebration, setCelebration] = useState<{
+    id: string;
+    name: string;
+    characterId: CharacterId;
+    mood: CharacterMood;
+    travelerName: string;
+  } | null>(null);
+  const dismissCelebration = useCallback(() => setCelebration(null), []);
+  const [reducedMotion, setReducedMotion] = useState(
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  const [selectedSailorId, setSelectedSailorId] = useState<string | null>(null);
+  const [selectedReactionDay, setSelectedReactionDay] = useState<string | null>(
+    null,
+  );
+  const [today, setToday] = useState(() => localDate());
+  useEffect(() => {
+    const timer = window.setInterval(() => setToday(localDate()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [online, setOnline] = useState(navigator.onLine);
-  const [offlineReady, setOfflineReady] = useState(false);
   const [allShips, setAllShips] = useState(false);
   const [menuLimit, setMenuLimit] = useState(36);
   /** Notifies other local tabs to reload; persistence remains in IndexedDB. */
@@ -95,9 +140,6 @@ export default function App() {
     needRefresh: [needRefresh],
     updateServiceWorker,
   } = useRegisterSW({
-    onOfflineReady() {
-      setOfflineReady(true);
-    },
     onRegisterError() {
       setNotice(
         "Offline cache is unavailable. Your journal can still save on this device.",
@@ -106,9 +148,6 @@ export default function App() {
   });
   // Load once, then keep connection status and other-tab saves reflected in the UI.
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.ready.then(() => setOfflineReady(true));
-    }
     read()
       .then((v) => {
         setSnapshot(v);
@@ -141,6 +180,22 @@ export default function App() {
     setFilter("all");
     setMenuLimit(36);
   }, [page, snapshot.data.activeSailingId]);
+  useEffect(() => {
+    setSelectedSailorId(null);
+    setSelectedReactionDay(null);
+  }, [snapshot.data.activeSailingId]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [page]);
+  useEffect(() => {
+    if (modal) setCelebration(null);
+  }, [modal]);
+  useEffect(() => {
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(preference.matches);
+    preference.addEventListener("change", update);
+    return () => preference.removeEventListener("change", update);
+  }, []);
   useEffect(() => {
     if (!notice) return;
     const t = setTimeout(() => setNotice(""), 5000);
@@ -202,7 +257,9 @@ export default function App() {
   }
   /** Saves an editor result and closes its dialog only if persistence succeeds. */
   async function commit(next: Data, message?: string) {
-    if (await save(next, message)) setModal(null);
+    if (!(await save(next, message))) return false;
+    setModal(null);
+    return true;
   }
   const retail = entries.reduce((n, e) => n + e.priceCents, 0);
   const covered = entries.reduce((n, e) => n + e.coveredCents, 0);
@@ -215,7 +272,21 @@ export default function App() {
         .toLocaleLowerCase()
         .includes(search.trim().toLocaleLowerCase()),
   );
-  const today = new Date().toLocaleDateString("en-CA");
+  const reactionDay = sailing
+    ? selectedReactionDay &&
+      selectedReactionDay >= sailing.start &&
+      selectedReactionDay <= sailing.end
+      ? selectedReactionDay
+      : today < sailing.start
+        ? sailing.start
+        : today > sailing.end
+          ? sailing.end
+          : today
+    : today;
+  const selectedSailor = crew.find((t) => t.id === selectedSailorId) ?? crew[0];
+  const selectedReaction = selectedSailor
+    ? sailorReaction(selectedSailor, entries, reactionDay)
+    : null;
   const catalogMatches = filterDrinks(drinks, search, filter);
   const discoveredIds = new Set(entries.map((e) => e.drinkId));
   /** Renders the shared search/category controls used by the menu and passport views. */
@@ -267,8 +338,8 @@ export default function App() {
         allShips={allShips}
         onAllShips={setAllShips}
         hasShipMenu={catalog.hasShipMenu}
-        onSave={(e, selectedDrink) =>
-          commit(
+        onSave={async (e, selectedDrink) => {
+          const saved = await commit(
             {
               ...data,
               drinks: data.drinks.some((d) => d.id === selectedDrink.id)
@@ -287,9 +358,26 @@ export default function App() {
                 ? data.entries.map((x) => (x.id === e.id ? e : x))
                 : [...data.entries, e],
             },
-            "Drink saved",
-          )
-        }
+            entry ? "Drink updated" : "",
+          );
+          if (saved && !entry) {
+            const traveler = crew.find((t) => t.id === e.travelerId)!;
+            const reaction = sailorReaction(
+              traveler,
+              [...entries, e],
+              e.sailingDate,
+            );
+            setSelectedSailorId(traveler.id);
+            setSelectedReactionDay(e.sailingDate);
+            setCelebration({
+              id: uid(),
+              name: e.name,
+              travelerName: traveler.name,
+              characterId: characterFor(traveler),
+              mood: reaction.mood,
+            });
+          }
+        }}
       />
     );
   }
@@ -302,78 +390,38 @@ export default function App() {
       </div>
     );
   return (
-    <div className="app">
-      <aside className="sidebar">
-        <a
-          className="brand"
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            setPage("Overview");
-          }}
-        >
-          <span className="brand-icon">
-            <Martini />
-          </span>
-          SipAhoy
-        </a>
-        <div className="sidebar-label">CRUISE DRINK TRACKER</div>
-        <nav aria-label="Main navigation">
-          {(Object.keys(icons) as Page[]).map((p) => {
-            const Icon = icons[p];
-            return (
-              <button
-                key={p}
-                aria-label={p}
-                aria-current={page === p ? "page" : undefined}
-                className={page === p ? "active" : ""}
-                onClick={() => setPage(p)}
-              >
-                <Icon size={19} />
-                {p}
-                {p === "Drink log" && entries.length > 0 && (
-                  <span className="nav-count" aria-hidden="true">
-                    {entries.length}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-        <div className="sidebar-bottom">
-          <button
-            className="plain"
-            onClick={() => setModal({ type: "backup" })}
-          >
-            <ArrowDownToLine size={17} /> Backups & exports
-          </button>
-          <div className="storage-label">
-            <span className="status-dot" /> Saved on this device
-          </div>
-        </div>
-      </aside>
+    <div className="app" data-motion={reducedMotion ? "paused" : "on"}>
       <main>
         <header className="topbar">
-          <span className="breadcrumb">
-            Your journal <span>/</span> <strong>{page}</strong>
-          </span>
-          <div className="top-actions">
-            <span className="connection">
-              <span className={"status-dot " + (!online ? "gold" : "")} />
-              {!online
-                ? "Offline"
-                : offlineReady
-                  ? "Ready for offline"
-                  : "Local journal"}
-            </span>
+          <div className="header-start">
             <button
-              className="icon-btn"
-              aria-label="Backups and exports"
-              onClick={() => setModal({ type: "backup" })}
+              className="icon-btn menu-trigger"
+              aria-label="Open menu"
+              aria-haspopup="dialog"
+              aria-expanded={menuOpen}
+              aria-controls={menuOpen ? "navigation-menu" : undefined}
+              onClick={() => {
+                setCelebration(null);
+                setMenuOpen(true);
+              }}
             >
-              <Settings size={19} />
+              <Menu size={23} />
             </button>
-            <div className="avatar mini">SA</div>
+          </div>
+          <div className="top-actions">
+            {!online && (
+              <span className="connection">
+                <span className="status-dot gold" />
+                Offline
+              </span>
+            )}
+            <button
+              className="mobile-brand"
+              aria-label="SipAhoy home"
+              onClick={() => setPage("Overview")}
+            >
+              <Brand />
+            </button>
           </div>
         </header>
         <div className="content">
@@ -405,9 +453,9 @@ export default function App() {
                         : "Manage sailings, travelers, and drink packages."}
               </p>
             </div>
-            {sailing && (
+            {sailing && (page === "Overview" || page === "Drink log") && (
               <button
-                className="button primary"
+                className="button primary log-action"
                 disabled={
                   busy ||
                   !crew.length ||
@@ -424,7 +472,7 @@ export default function App() {
           {!sailing ? (
             <section className="empty-onboard">
               <div className="nautical">
-                <Ship size={64} />
+                <Skipper />
               </div>
               <h2>Create a sailing</h2>
               <p>
@@ -456,33 +504,16 @@ export default function App() {
             </section>
           ) : (
             <>
-              <div className="sailing-switch">
-                <Ship size={17} />
-                <select
-                  aria-label="Active sailing"
-                  value={sailing.id}
-                  disabled={busy}
-                  onChange={(e) =>
-                    save(
-                      { ...data, activeSailingId: e.target.value },
-                      "Sailing switched",
-                    )
-                  }
-                >
-                  {data.sailings.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} · {s.ship}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown size={14} />
-                <button
-                  className="plain"
-                  onClick={() => setModal({ type: "sailing" })}
-                >
-                  <Plus size={15} /> New sailing
-                </button>
-              </div>
+              <SailingPicker
+                sailing={sailing}
+                sailings={data.sailings}
+                busy={busy}
+                error={error}
+                onSelect={(id) =>
+                  save({ ...data, activeSailingId: id }, "Sailing switched")
+                }
+                onNew={() => setModal({ type: "sailing" })}
+              />
               {crew.length === 0 && (
                 <div className="banner">
                   Add your first traveler to start logging.{" "}
@@ -509,11 +540,17 @@ export default function App() {
                         <div className="avatar-stack">
                           {crew.slice(0, 4).map((t) => (
                             <span
-                              className="avatar"
-                              style={{ background: t.color }}
+                              className="avatar sailor-avatar"
                               key={t.id}
+                              title={t.name}
                             >
-                              {t.name.slice(0, 1)}
+                              <CharacterPortrait
+                                characterId={characterFor(t)}
+                                mood={
+                                  sailorReaction(t, entries, reactionDay).mood
+                                }
+                                decorative
+                              />
                             </span>
                           ))}
                         </div>
@@ -527,40 +564,13 @@ export default function App() {
                         </button>
                       </div>
                     </div>
-                    <div className="hero-art" aria-hidden="true">
-                      <div className="sun" />
-                      <svg viewBox="0 0 420 230">
-                        <g
-                          fill="none"
-                          stroke="#c5d8cd"
-                          strokeWidth="1.2"
-                          opacity=".5"
-                        >
-                          <path d="M35 185Q110 160 185 185t160 0M5 210Q80 185 155 210t180 0" />
-                        </g>
-                        <path d="M105 133h244l-29 39H137z" fill="#dce5d7" />
-                        <path d="M154 83h142l24 50H129z" fill="#f4f1de" />
-                        <path d="M185 58h89v24h-89z" fill="#dce5d7" />
-                        <path d="M210 40h23v18h-23z" fill="#e7aa8c" />
-                        <g fill="#2f6265">
-                          {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-                            <rect
-                              key={i}
-                              x={156 + i * 20}
-                              y="109"
-                              width="10"
-                              height="8"
-                              rx="2"
-                            />
-                          ))}
-                        </g>
-                        <path
-                          d="M84 175q28-17 56 0t56 0t56 0t56 0t56 0"
-                          fill="none"
-                          stroke="#97b8ad"
-                          strokeWidth="4"
-                        />
-                      </svg>
+                    <div className="hero-art">
+                      <Skipper
+                        key={`${selectedSailor?.id}-${reactionDay}`}
+                        characterId={characterFor(selectedSailor)}
+                        mood={selectedReaction?.mood ?? "ready"}
+                        travelerName={selectedSailor?.name}
+                      />
                     </div>
                   </section>
                   <section
@@ -592,6 +602,18 @@ export default function App() {
                       icon={<Compass />}
                     />
                   </section>
+                  <CrewReactions
+                    crew={crew}
+                    entries={entries}
+                    sailing={sailing}
+                    day={reactionDay}
+                    onDay={setSelectedReactionDay}
+                    selectedId={selectedSailor?.id}
+                    onSelect={setSelectedSailorId}
+                    onEdit={() =>
+                      setModal({ type: "traveler", traveler: selectedSailor })
+                    }
+                  />
                   <div className="dashboard-grid">
                     <section className="card">
                       <SectionTitle
@@ -977,6 +999,10 @@ export default function App() {
               {page === "Sailing & crew" && (
                 <>
                   <section className="card sailing-detail">
+                    <div className="sailing-detail-art">
+                      <ShipArtwork ship={sailing.ship} />
+                      <ShipArtworkCredit />
+                    </div>
                     <div>
                       <span className="eyebrow">CURRENT SAILING</span>
                       <h2>{sailing.name}</h2>
@@ -1006,6 +1032,16 @@ export default function App() {
                       <Plus size={16} /> Add traveler
                     </button>
                   </div>
+                  <div className="crew-day-control">
+                    <ReactionDay
+                      sailing={sailing}
+                      day={reactionDay}
+                      onChange={setSelectedReactionDay}
+                    />
+                    <p className="footnote">
+                      Playful daily reactions, not an intoxication estimate.
+                    </p>
+                  </div>
                   <div className="crew-grid">
                     {crew.map((t) => {
                       const stats = travelerStats(t, sailing, entries);
@@ -1017,11 +1053,16 @@ export default function App() {
                             setModal({ type: "traveler", traveler: t })
                           }
                         >
-                          <span
-                            className="avatar"
-                            style={{ background: t.color }}
-                          >
-                            {t.name.slice(0, 1)}
+                          <CharacterPortrait
+                            characterId={characterFor(t)}
+                            mood={sailorReaction(t, entries, reactionDay).mood}
+                          />
+                          <span className="crew-mood-label">
+                            {
+                              moods[
+                                sailorReaction(t, entries, reactionDay).mood
+                              ].label
+                            }
                           </span>
                           <h3>{t.name}</h3>
                           <p>
@@ -1073,11 +1114,108 @@ export default function App() {
           </footer>
         </div>
       </main>
+      {celebration && !modal && (
+        <SaveCelebration
+          key={celebration.id}
+          name={celebration.name}
+          characterId={celebration.characterId}
+          mood={celebration.mood}
+          travelerName={celebration.travelerName}
+          onClose={dismissCelebration}
+        />
+      )}
       {notice && (
         <div className="toast" role="status">
           <Check size={17} />
           {notice}
         </div>
+      )}
+      {menuOpen && (
+        <ModalShell
+          title="All aboard"
+          className="navigation-menu"
+          id="navigation-menu"
+          mobileSheet
+          onClose={() => setMenuOpen(false)}
+        >
+          <nav aria-label="Main navigation">
+            <div className="menu-shortcuts">
+              <button
+                className="menu-home"
+                aria-current={page === "Overview" ? "page" : undefined}
+                onClick={() => {
+                  setMenuOpen(false);
+                  setPage("Overview");
+                }}
+              >
+                <LayoutDashboard size={24} />
+                <span>Home</span>
+              </button>
+              <button
+                className="menu-log"
+                disabled={
+                  !sailing ||
+                  busy ||
+                  !crew.length ||
+                  !drinks.length ||
+                  !venues.length ||
+                  fatal
+                }
+                onClick={() => {
+                  setMenuOpen(false);
+                  setModal({ type: "log" });
+                }}
+              >
+                <Plus size={24} />
+                <span>Log a drink</span>
+              </button>
+            </div>
+            {(Object.keys(icons) as Page[])
+              .filter((p) => p !== "Overview")
+              .map((p) => {
+                const Icon = icons[p];
+                return (
+                  <button
+                    key={p}
+                    className="menu-destination"
+                    aria-current={page === p ? "page" : undefined}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setPage(p);
+                    }}
+                  >
+                    <Icon size={21} />
+                    <span>{p}</span>
+                    <ArrowRight size={17} />
+                  </button>
+                );
+              })}
+          </nav>
+          <div className="menu-footer">
+            <button
+              className="plain"
+              onClick={() => {
+                setMenuOpen(false);
+                setModal({ type: "backup" });
+              }}
+            >
+              <ArrowDownToLine size={18} />
+              Backups & exports
+            </button>
+            {!installation.installed && (
+              <button
+                className="plain install-menu-action"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setModal({ type: "install" });
+                }}
+              >
+                <Download size={18} />
+                Install SipAhoy
+              </button>
+            )}
+          </div>
+        </ModalShell>
       )}
       {modal && (
         <ModalShell
@@ -1098,7 +1236,9 @@ export default function App() {
                     ? modal.drink
                       ? "Edit menu drink"
                       : "Add menu drink"
-                    : "Backups & exports"
+                    : modal.type === "install"
+                      ? "Install SipAhoy"
+                      : "Backups & exports"
           }
           onClose={() => {
             if (!busy) setModal(null);
@@ -1157,6 +1297,11 @@ export default function App() {
             <TravelerForm
               existing={modal.traveler}
               defaults={modal.traveler ? undefined : crew.at(-1)}
+              defaultCharacter={
+                characterIds.find(
+                  (id) => !crew.some((t) => characterFor(t) === id),
+                ) ?? characterIds[crew.length % characterIds.length]
+              }
               sailing={sailing}
               busy={busy}
               onSave={(t) =>
@@ -1201,6 +1346,9 @@ export default function App() {
                 )
               }
             />
+          )}
+          {modal.type === "install" && (
+            <InstallGuide installation={installation} />
           )}
           {modal.type === "backup" && (
             <BackupForm

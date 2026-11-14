@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { Martini, X } from "lucide-react";
+import { useMobileSheet } from "./useMobileSheet";
 
 /** Inputs for ModalShell. */
 type ModalShellProps = {
@@ -9,29 +10,87 @@ type ModalShellProps = {
   onClose: () => void;
   /** Dialog body, usually a focused form. */
   children: ReactNode;
+  className?: string;
+  id?: string;
+  /** Enables a real draggable handle on phone-sized navigation sheets. */
+  mobileSheet?: boolean;
 };
 
 /** Uses the native modal dialog for focus handling and reports Escape/backdrop dismissal to its owner. */
-export function ModalShell({ title, onClose, children }: ModalShellProps) {
+export function ModalShell({
+  title,
+  onClose,
+  children,
+  className,
+  id,
+  mobileSheet = false,
+}: ModalShellProps) {
   const ref = useRef<HTMLDialogElement>(null);
+  const sheet = useMobileSheet(ref, onClose);
   useEffect(() => {
+    const previousFocus =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    const scrollY = window.scrollY;
+    const previous = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+    };
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
     ref.current?.showModal();
+    return () => {
+      Object.assign(document.body.style, previous);
+      window.scrollTo({ top: scrollY, behavior: "instant" });
+      if (previousFocus?.isConnected)
+        previousFocus.focus({ preventScroll: true });
+    };
   }, []);
   return (
     <dialog
       ref={ref}
+      className={className}
+      id={id}
+      style={mobileSheet ? sheet.style : undefined}
+      data-sheet={
+        mobileSheet ? (sheet.expanded ? "expanded" : "compact") : undefined
+      }
+      data-dragging={mobileSheet && sheet.dragging ? "true" : undefined}
+      data-closing={mobileSheet && sheet.closing ? "true" : undefined}
+      onTransitionEnd={mobileSheet ? sheet.onTransitionEnd : undefined}
       onCancel={(e) => {
         e.preventDefault();
         onClose();
       }}
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (!mobileSheet && e.target === e.currentTarget) onClose();
       }}
       aria-label={title}
     >
       <div className="modal-head">
+        {mobileSheet && (
+          <button
+            type="button"
+            className="sheet-handle"
+            aria-label={
+              sheet.expanded
+                ? "Collapse navigation menu"
+                : "Expand navigation menu"
+            }
+            aria-expanded={sheet.expanded}
+            title="Drag up to expand; pull down one-third of the menu to close"
+            {...sheet.handleProps}
+          >
+            <span />
+          </button>
+        )}
         <div>
-          <h2>{title}</h2>
+          <h2 tabIndex={-1} autoFocus>
+            {title}
+          </h2>
         </div>
         <button
           className="icon-btn"
@@ -41,7 +100,7 @@ export function ModalShell({ title, onClose, children }: ModalShellProps) {
           <X />
         </button>
       </div>
-      {children}
+      {mobileSheet ? <div className="sheet-content">{children}</div> : children}
     </dialog>
   );
 }

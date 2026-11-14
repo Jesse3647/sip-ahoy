@@ -4,6 +4,7 @@
  * Money uses integer USD cents; null means unknown, while zero is a known value.
  */
 import { z } from "zod";
+import { characterIds } from "./characters";
 const id = z.string().min(1).max(100);
 const name = z.string().trim().min(1).max(100);
 const cents = z.number().int().min(0).max(100000000);
@@ -82,6 +83,8 @@ const travelerSchema = z.object({
   name,
   /** Avatar color used to distinguish travelers. */
   color: z.string().max(30),
+  /** Selected mascot; older journals use a stable display-only fallback until edited. */
+  characterId: z.enum(characterIds).optional(),
   /** Whether package coverage and comparisons apply. */
   hasPackage: z.boolean(),
   /** Legacy fee-inclusive daily cost; retained for older journals. */
@@ -450,6 +453,7 @@ export const backupSchema = z.object({
     z.literal(3),
     z.literal(4),
     z.literal(5),
+    z.literal(6),
   ]),
   exportedAt: z.string(),
   data: dataSchema,
@@ -465,10 +469,10 @@ export function importBackup(text: string): Data {
     );
   return parsed.data.data;
 }
-/** Serializes the whole journal as a version-5 JSON backup with an export timestamp. */
+/** Serializes the whole journal as a version-6 JSON backup with an export timestamp. */
 export const backup = (data: Data) =>
   JSON.stringify(
-    { app: "SipAhoy", version: 5, exportedAt: new Date().toISOString(), data },
+    { app: "SipAhoy", version: 6, exportedAt: new Date().toISOString(), data },
     null,
     2,
   );
@@ -567,6 +571,7 @@ export function demoData(): Data {
       id: uid(),
       sailingId: s.id,
       name: "Alex",
+      characterId: "skipper",
       color: "#dba18e",
       hasPackage: true,
       dailyCostCents: 6500,
@@ -576,6 +581,7 @@ export function demoData(): Data {
       id: uid(),
       sailingId: s.id,
       name: "Sam",
+      characterId: "pip",
       color: "#8ab3ad",
       hasPackage: false,
       dailyCostCents: null,

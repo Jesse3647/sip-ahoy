@@ -1,3 +1,4 @@
+import { navigate, openLog, openBackups } from "./navigation";
 import { test, expect, type Page } from "@playwright/test";
 
 test("drink descriptions are editable, searchable, backed up, and available offline", async ({
@@ -8,9 +9,7 @@ test("drink descriptions are editable, searchable, backed up, and available offl
   await page
     .getByRole("button", { name: "Take a look with sample data" })
     .click();
-  await page
-    .getByRole("button", { name: "Menus & prices", exact: true })
-    .click();
+  await navigate(page, "Menus & prices");
   await page.getByLabel("Search ship menu").fill("Piña Colada");
   const card = page.locator(".menu-item").filter({
     has: page.getByRole("heading", { name: "Piña Colada", exact: true }),
@@ -33,9 +32,7 @@ test("drink descriptions are editable, searchable, backed up, and available offl
 
   // An unchanged reference must not become a local override just because a price editor was opened.
   const readExport = async () => {
-    await page
-      .getByRole("button", { name: "Backups and exports", exact: true })
-      .click();
+    await openBackups(page);
     const downloadPromise = page.waitForEvent("download");
     await page
       .getByRole("button", { name: "Export full JSON backup", exact: true })
@@ -69,9 +66,7 @@ test("drink descriptions are editable, searchable, backed up, and available offl
   await expect(card.locator(".drink-description")).toHaveText(custom);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: "test-results/descriptions-mobile.png" });
-  await page
-    .getByRole("button", { name: "Drink passport", exact: true })
-    .click();
+  await navigate(page, "Drink passport");
   await page.getByLabel("Search drink passport").fill("Silky");
   await expect(page.locator(".passport-stamp")).toHaveCount(1);
   await expect(page.locator(".passport-stamp .drink-description")).toHaveText(
@@ -89,7 +84,7 @@ test("drink descriptions are editable, searchable, backed up, and available offl
   ).toBeVisible();
   await context.setOffline(true);
   await page.reload();
-  await page.getByRole("button", { name: "Log a drink", exact: true }).click();
+  await openLog(page);
   await page
     .getByRole("searchbox", { name: "Search drinks", exact: true })
     .fill("Silky");
@@ -105,7 +100,7 @@ test("drink descriptions are editable, searchable, backed up, and available offl
   await page.getByRole("button", { name: "Save drink", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   const exported = await readExport();
-  expect(exported.version).toBe(5);
+  expect(exported.version).toBe(6);
   expect(
     exported.data.drinks.find((d: { name: string }) => d.name === "Piña Colada")
       .description,
@@ -126,7 +121,7 @@ test("search fields stay usable across pages and screen sizes", async ({
       ["Menus & prices", "Search ship menu"],
       ["Drink passport", "Search drink passport"],
     ]) {
-      await page.getByRole("button", { name: tab, exact: true }).click();
+      await navigate(page, tab);
       const input = page.getByLabel(label, { exact: true });
       await expect(input).toBeVisible();
       const sizes = await input.evaluate((element) => {
@@ -160,9 +155,7 @@ test("search fields stay usable across pages and screen sizes", async ({
         });
       }
     }
-    await page
-      .getByRole("button", { name: "Log a drink", exact: true })
-      .click();
+    await openLog(page);
     const picker = page.getByRole("searchbox", {
       name: "Search drinks",
       exact: true,
@@ -210,16 +203,14 @@ test("setup, venue prices, package cap, logging, backups, and offline persistenc
   await expect(
     page.getByRole("heading", { name: "Caribbean week", exact: true }),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Sailing & crew", exact: true })
-    .click();
+  await navigate(page, "Sailing & crew");
   await page.getByRole("button", { name: "Edit sailing", exact: true }).click();
   await expect(
     page.getByRole("combobox", { name: "Ship", exact: true }),
   ).toBeDisabled();
   await page.getByRole("button", { name: "Save sailing", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page.getByRole("button", { name: "Overview", exact: true }).click();
+  await navigate(page, "Overview");
   await page.getByRole("button", { name: "Add traveler", exact: true }).click();
   await page.getByLabel("Traveler name").fill("Jesse");
   await page.getByLabel("This traveler has a drink package").check();
@@ -229,9 +220,7 @@ test("setup, venue prices, package cap, logging, backups, and offline persistenc
   await page.getByLabel("Maximum covered per drink").fill("12");
   await page.getByRole("button", { name: "Save traveler" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page
-    .getByRole("button", { name: "Menus & prices", exact: true })
-    .click();
+  await navigate(page, "Menus & prices");
   await page.getByLabel("Search ship menu").fill("Piña Colada");
   await page
     .getByRole("button", { name: /Piña Colada.*Default price/ })
@@ -240,7 +229,7 @@ test("setup, venue prices, package cap, logging, backups, and offline persistenc
   await page.getByLabel("Pool Bar · USD", { exact: true }).fill("17");
   await page.getByRole("button", { name: "Save menu drink" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page.getByRole("button", { name: "Log a drink", exact: true }).click();
+  await openLog(page);
   await expect(page.locator(".selected-drink")).toHaveCount(0);
   await expect(
     page.getByRole("button", { name: "Save drink", exact: true }),
@@ -258,20 +247,18 @@ test("setup, venue prices, package cap, logging, backups, and offline persistenc
   await page.getByLabel("Notes (optional)").fill("First sip at sea");
   await page.getByRole("button", { name: "Save drink" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page.getByRole("button", { name: "Overview", exact: true }).click();
+  await navigate(page, "Overview");
   await expect(page.locator(".stat").nth(1)).toContainText("$17.00");
   await expect(page.locator(".package-numbers")).toContainText(
     "$408.00 to break even",
   );
-  await page.getByRole("button", { name: "Drink log", exact: true }).click();
+  await navigate(page, "Drink log");
   await page.getByRole("button", { name: /Piña Colada Jesse/ }).click();
   await page.getByLabel("Menu price · USD", { exact: true }).fill("18");
   await page.getByRole("button", { name: "Save changes" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.locator(".log-price")).toContainText("$18.00");
-  await page
-    .getByRole("button", { name: "Backups and exports", exact: true })
-    .click();
+  await openBackups(page);
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export full JSON backup" }).click();
   const backup = await download;
@@ -301,14 +288,14 @@ test("setup, venue prices, package cap, logging, backups, and offline persistenc
   await page.reload();
   await expect(page.locator(".log-price")).toContainText("$18.00");
   await expect(page.getByText("Offline", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Log a drink", exact: true }).click();
+  await openLog(page);
   await expect(page.locator(".selected-drink")).toHaveCount(0);
   await selectDrink(page, "Piña Colada");
   await page.getByLabel("Date", { exact: true }).fill("2026-11-14");
   await page.getByRole("button", { name: "Save drink" }).click();
   await expect(page.locator(".log-row")).toHaveCount(2);
   await page.reload();
-  await page.getByRole("button", { name: "Drink log", exact: true }).click();
+  await navigate(page, "Drink log");
   await expect(page.locator(".log-row")).toHaveCount(2);
   await page
     .getByRole("button", { name: "Repeat Piña Colada", exact: true })
@@ -356,7 +343,7 @@ test("sample dashboard and mobile layouts stay usable", async ({ page }) => {
     "Menus & prices",
     "Sailing & crew",
   ]) {
-    await page.getByRole("button", { name: section, exact: true }).click();
+    await navigate(page, section);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -383,12 +370,11 @@ test("sample dashboard and mobile layouts stay usable", async ({ page }) => {
     .getByRole("button", { name: "Create sailing", exact: true })
     .click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page
-    .getByRole("button", { name: "Menus & prices", exact: true })
-    .click();
+  await navigate(page, "Menus & prices");
   await page.getByLabel("Search ship menu").fill("Piña Colada");
   await expect(page.locator(".menu-item")).toHaveCount(1);
-  await page.getByLabel("Active sailing").selectOption({ index: 0 });
+  await page.getByRole("button", { name: /^Change sailing:/ }).click();
+  await page.locator(".sailing-option").first().click();
 });
 
 test("daily and trip bundles show separate paid and drink-only totals, including unknown extras", async ({
@@ -398,9 +384,7 @@ test("daily and trip bundles show separate paid and drink-only totals, including
   await page
     .getByRole("button", { name: "Take a look with sample data" })
     .click();
-  await page
-    .getByRole("button", { name: "Sailing & crew", exact: true })
-    .click();
+  await navigate(page, "Sailing & crew");
   await page
     .getByRole("button")
     .filter({ has: page.getByRole("heading", { name: "Alex", exact: true }) })
@@ -447,9 +431,7 @@ test("daily and trip bundles show separate paid and drink-only totals, including
     .click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.reload();
-  await page
-    .getByRole("button", { name: "Sailing & crew", exact: true })
-    .click();
+  await navigate(page, "Sailing & crew");
   await expect(page.locator(".package-numbers").first()).toContainText(
     "$510.00 drink-only cost",
   );
@@ -480,7 +462,7 @@ test("community drink search, traveler recents, local price overrides, custom dr
   await page
     .getByRole("button", { name: "Take a look with sample data" })
     .click();
-  await page.getByRole("button", { name: "Log a drink", exact: true }).click();
+  await openLog(page);
   await page
     .getByRole("searchbox", { name: "Search drinks", exact: true })
     .fill("Toasted Marshmallow");
@@ -503,7 +485,7 @@ test("community drink search, traveler recents, local price overrides, custom dr
   ).toHaveValue("14.00");
   await page.getByRole("button", { name: "Save drink", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page.getByRole("button", { name: "Log a drink", exact: true }).click();
+  await openLog(page);
   await expect(
     page.getByLabel("For whom?").locator("option:checked"),
   ).toHaveText("Alex");
@@ -518,9 +500,7 @@ test("community drink search, traveler recents, local price overrides, custom dr
     .click();
   await page.getByRole("button", { name: "Save drink", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page
-    .getByRole("button", { name: "Menus & prices", exact: true })
-    .click();
+  await navigate(page, "Menus & prices");
   await page.getByLabel("Search ship menu").fill("Toasted Marshmallow");
   await page.locator(".menu-item").click();
   await page.getByLabel("Default price · USD", { exact: true }).fill("13.25");
@@ -529,7 +509,7 @@ test("community drink search, traveler recents, local price overrides, custom dr
     .getByRole("button", { name: "Save menu drink", exact: true })
     .click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page.getByRole("button", { name: "Log a drink", exact: true }).click();
+  await openLog(page);
   await expect(page.locator(".selected-drink")).toHaveCount(0);
   await page
     .getByRole("button", {
@@ -562,7 +542,7 @@ test("community drink search, traveler recents, local price overrides, custom dr
   await page.reload();
   await context.setOffline(true);
   await page.reload();
-  await page.getByRole("button", { name: "Log a drink", exact: true }).click();
+  await openLog(page);
   await expect(
     page.getByRole("button", { name: "Recent Jesse Sunset Fizz", exact: true }),
   ).toBeVisible();
@@ -589,7 +569,7 @@ test("community drink search, traveler recents, local price overrides, custom dr
   await page.getByRole("button", { name: "Save drink", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.reload();
-  await page.getByRole("button", { name: "Drink log", exact: true }).click();
+  await navigate(page, "Drink log");
   await expect(
     page.locator(".log-row").filter({ hasText: "Iced Café Latte" }),
   ).toHaveCount(1);
@@ -606,13 +586,11 @@ test("Chandon aliases collapse in menus and search, and fresh logs never presele
   await page
     .getByRole("button", { name: "Take a look with sample data" })
     .click();
-  await page
-    .getByRole("button", { name: "Menus & prices", exact: true })
-    .click();
+  await navigate(page, "Menus & prices");
   await page.getByLabel("Include community drinks from other ships").check();
   await page.getByLabel("Search ship menu").fill("Chandon");
   await expect(page.locator(".menu-item")).toHaveCount(9);
-  await page.getByRole("button", { name: "Log a drink", exact: true }).click();
+  await openLog(page);
   await expect(page.locator(".selected-drink")).toHaveCount(0);
   await expect(
     page.getByRole("button", { name: "Save drink", exact: true }),
@@ -629,7 +607,7 @@ test("Chandon aliases collapse in menus and search, and fresh logs never presele
     .click();
   await page.getByRole("button", { name: "Save drink", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page.getByRole("button", { name: "Log a drink", exact: true }).click();
+  await openLog(page);
   await expect(page.locator(".selected-drink")).toHaveCount(0);
   await expect(
     page.getByRole("button", {
@@ -641,7 +619,7 @@ test("Chandon aliases collapse in menus and search, and fresh logs never presele
     page.getByRole("button", { name: "Save drink", exact: true }),
   ).toBeDisabled();
   await page.getByRole("button", { name: "Close dialog", exact: true }).click();
-  await page.getByRole("button", { name: "Drink log", exact: true }).click();
+  await navigate(page, "Drink log");
   await page
     .getByRole("button", { name: "Repeat Chandon Brut Classic", exact: true })
     .click();
@@ -661,7 +639,7 @@ test("Bionic Bar is available on Wonder and time is captured on save without a t
   await page
     .getByRole("button", { name: "Take a look with sample data" })
     .click();
-  await page.getByRole("button", { name: "Log a drink", exact: true }).click();
+  await openLog(page);
   await selectDrink(page, "Piña Colada");
   await page.getByLabel("Where?").selectOption({ label: "Bionic Bar" });
   await expect(
@@ -672,9 +650,7 @@ test("Bionic Bar is available on Wonder and time is captured on save without a t
   await page.getByRole("button", { name: "Save drink", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   const readBackup = async () => {
-    await page
-      .getByRole("button", { name: "Backups and exports", exact: true })
-      .click();
+    await openBackups(page);
     const pending = page.waitForEvent("download");
     await page
       .getByRole("button", { name: "Export full JSON backup", exact: true })
@@ -694,13 +670,13 @@ test("Bionic Bar is available on Wonder and time is captured on save without a t
   expect(logged.createdAt).toBe(logged.time);
   expect(logged.sailingDate).toBe("2026-11-13");
   await page.reload();
-  await page.getByRole("button", { name: "Log a drink", exact: true }).click();
+  await openLog(page);
   await expect(page.getByLabel("Where?").locator("option:checked")).toHaveText(
     "Bionic Bar",
   );
   await page.getByRole("button", { name: "Close dialog", exact: true }).click();
   await page.clock.setFixedTime(new Date("2026-11-14T15:17:00.000Z"));
-  await page.getByRole("button", { name: "Drink log", exact: true }).click();
+  await navigate(page, "Drink log");
   await page.locator(".log-row").filter({ hasText: "Bionic Bar" }).click();
   await page.getByLabel("Notes (optional)").fill("Updated note");
   await page.getByRole("button", { name: "Save changes", exact: true }).click();
@@ -718,7 +694,7 @@ test("drink log combines search with traveler filtering and new travelers inheri
   await page
     .getByRole("button", { name: "Take a look with sample data" })
     .click();
-  await page.getByRole("button", { name: "Drink log", exact: true }).click();
+  await navigate(page, "Drink log");
   await expect(page.getByLabel("Search drink log")).toBeVisible();
   await expect(page.locator(".log-row")).toHaveCount(18);
   await page.getByLabel("Filter by traveler").selectOption({ label: "Alex" });
@@ -731,14 +707,12 @@ test("drink log combines search with traveler filtering and new travelers inheri
   await expect(page.locator(".log-row")).toHaveCount(0);
   await page.getByLabel("Search drink log").fill("");
   await expect(page.locator(".log-row")).toHaveCount(9);
-  await page.getByRole("button", { name: "Log a drink", exact: true }).click();
+  await openLog(page);
   await expect(
     page.getByRole("searchbox", { name: "Search drinks", exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Close dialog", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Sailing & crew", exact: true })
-    .click();
+  await navigate(page, "Sailing & crew");
   await page
     .getByRole("button")
     .filter({ has: page.getByRole("heading", { name: "Sam", exact: true }) })
@@ -825,7 +799,7 @@ test("drink log combines search with traveler filtering and new travelers inheri
     .getByRole("button", { name: "Create sailing", exact: true })
     .click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page.getByRole("button", { name: "Overview", exact: true }).click();
+  await navigate(page, "Overview");
   await page.getByRole("button", { name: "Add traveler", exact: true }).click();
   await expect(page.getByLabel("Traveler name")).toHaveValue("");
   await expect(

@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { ShipArtwork, ShipArtworkCredit } from "../components/ShipArtwork";
 import { ArrowRight } from "lucide-react";
 import { uid, type Sailing } from "../model";
 import { royalCaribbeanShips } from "../ships";
@@ -15,6 +17,7 @@ type SailingFormProps = {
 
 /** Creates or edits a trip while keeping an existing ship/catalog association fixed. */
 export function SailingForm({ existing, busy, onSave }: SailingFormProps) {
+  const [ship, setShip] = useState(existing?.ship ?? "");
   return (
     <form
       onSubmit={(e) => {
@@ -43,7 +46,8 @@ export function SailingForm({ existing, busy, onSave }: SailingFormProps) {
       <Field label="Ship">
         <select
           name="ship"
-          defaultValue={existing?.ship ?? ""}
+          value={ship}
+          onChange={(event) => setShip(event.target.value)}
           required
           disabled={!!existing}
         >
@@ -63,6 +67,12 @@ export function SailingForm({ existing, busy, onSave }: SailingFormProps) {
           ))}
         </select>
       </Field>
+      {ship && (
+        <div className="sailing-ship-preview">
+          <ShipArtwork ship={ship} />
+          <ShipArtworkCredit />
+        </div>
+      )}
       {existing && (
         <p className="footnote">
           Create a new sailing for a different ship. Menus are shared across

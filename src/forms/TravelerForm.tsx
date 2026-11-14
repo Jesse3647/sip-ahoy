@@ -7,6 +7,13 @@ import {
   parsePricingDraft,
 } from "../PackagePricing";
 import { Field } from "../components/ui";
+import {
+  characterFor,
+  characterIds,
+  characters,
+  type CharacterId,
+} from "../characters";
+import { CharacterPortrait } from "../components/CharacterPortrait";
 
 /** Inputs for TravelerForm. */
 type TravelerFormProps = {
@@ -14,6 +21,8 @@ type TravelerFormProps = {
   existing?: Traveler;
   /** Most recently added traveler on this sailing; copies package settings, never identity or name. */
   defaults?: Traveler;
+  /** Suggested unused character for a new sailor; does not copy the previous sailor's identity. */
+  defaultCharacter?: CharacterId;
   /** Active trip, including its ship namespace and valid dates. */
   sailing: Sailing;
   /** Disables submission while the parent persists changes. */
@@ -26,6 +35,7 @@ type TravelerFormProps = {
 export function TravelerForm({
   existing,
   defaults,
+  defaultCharacter = "skipper",
   sailing,
   busy,
   onSave,
@@ -35,6 +45,9 @@ export function TravelerForm({
   const [hasPackage, setHasPackage] = useState(template?.hasPackage ?? false);
   const [errorMessage, setErr] = useState("");
   const [pricing, setPricing] = useState(() => pricingDraft(template, sailing));
+  const [characterId, setCharacterId] = useState<CharacterId>(
+    existing ? characterFor(existing) : defaultCharacter,
+  );
   return (
     <form
       onSubmit={(e) => {
@@ -45,6 +58,7 @@ export function TravelerForm({
             id: existing?.id ?? uid(),
             sailingId: sailing.id,
             name: String(formData.get("name")).trim(),
+            characterId,
             color:
               existing?.color ??
               ["#dba18e", "#8ab3ad", "#ceb46e", "#a8abd0"][
@@ -82,6 +96,34 @@ export function TravelerForm({
           defaultValue={existing?.name}
         />
       </Field>
+      <fieldset className="character-picker">
+        <legend>Choose a sailor character</legend>
+        <div className="character-options">
+          {characterIds.map((id) => (
+            <label
+              className="character-option"
+              key={id}
+              style={{ background: characters[id].color }}
+            >
+              <input
+                type="radio"
+                name="character"
+                value={id}
+                checked={characterId === id}
+                onChange={() => setCharacterId(id)}
+                aria-label={`${characters[id].name}, ${characters[id].species}`}
+              />
+              <CharacterPortrait characterId={id} decorative />
+              <strong>{characters[id].name}</strong>
+              <small>{characters[id].species}</small>
+            </label>
+          ))}
+        </div>
+        <p className="footnote">
+          Your character reacts to your logs for each day. You can change
+          characters anytime.
+        </p>
+      </fieldset>
       <label className="check-field">
         <input
           type="checkbox"

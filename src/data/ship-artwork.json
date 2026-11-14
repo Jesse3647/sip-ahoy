@@ -1,0 +1,126 @@
+{
+  "Hero of the Seas": {
+    "file": "hero.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/hero-of-the-seas-aft"
+  },
+  "Legend of the Seas": {
+    "file": "legend.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/legend-of-the-seas-daytime-aft-view-vertical-render-700-530-2-2"
+  },
+  "Star of the Seas": {
+    "file": "star.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/star-of-the-seas-sailing-900-900"
+  },
+  "Icon of the Seas": {
+    "file": "icon.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/icon-of-the-seas-aerial-angle-aft-day-1"
+  },
+  "Allure of the Seas": {
+    "file": "allure.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/allure-of-the-seas-ship-sailing-900-900"
+  },
+  "Harmony of the Seas": {
+    "file": "harmony.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/harmony-of-the-seas-bow-angle-900-900"
+  },
+  "Symphony of the Seas": {
+    "file": "symphony.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/symphony-of-the-seas-ship-top-view-aerial"
+  },
+  "Oasis of the Seas": {
+    "file": "oasis.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/oasis-of-the-seas-aft-900-900"
+  },
+  "Utopia of the Seas": {
+    "file": "utopia.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/utopia-of-the-sea-aft-ocean-horizon-1920-800"
+  },
+  "Wonder of the Seas": {
+    "file": "wonder.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/wonder-of-the-seas-cruise-ship-aerial-aft-700-530-2-1"
+  },
+  "Adventure of the Seas": {
+    "file": "adventure.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/adventure-exterior-horizon-day-island-ship-900-900"
+  },
+  "Anthem of the Seas": {
+    "file": "anthem.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/Anthem%20of%20the%20Seas"
+  },
+  "Brilliance of the Seas": {
+    "file": "brilliance.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/brilliance-of-the-seas-hero-900-900"
+  },
+  "Enchantment of the Seas": {
+    "file": "enchantment.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/enchantment-exterior-side-aerial-day-sailing-ship-900-900"
+  },
+  "Explorer of the Seas": {
+    "file": "explorer.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/explorer-exterior-side-aerial-day-sailing-ship-900-900"
+  },
+  "Freedom of the Seas": {
+    "file": "freedom.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/freedom-exterior-side-aerial-day-sailing-ship-900-900"
+  },
+  "Grandeur of the Seas": {
+    "file": "grandeur.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/grandeur-of-the-seas-sailing-900-900"
+  },
+  "Independence of the Seas": {
+    "file": "independence.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/independence-cruise-ship-europe-may2018-revite-amped-up-hero-shot-900-900"
+  },
+  "Jewel of the Seas": {
+    "file": "jewel.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/jewel-of-the-seas-grenada-docked-harbor-900-900"
+  },
+  "Liberty of the Seas": {
+    "file": "liberty.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/liberty-of-the-seas-ship-carousel-mobile-700-530.?fmt=png-alpha"
+  },
+  "Mariner of the Seas": {
+    "file": "mariner.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/mariner-side-of-the-ship-tile-900-900"
+  },
+  "Navigator of the Seas": {
+    "file": "navigator.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/navigator-of-the-seas-aft-aerial-slides-hero-1"
+  },
+  "Odyssey of the Seas": {
+    "file": "odyssey.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/odyssey-side-view-ship-sunset-tile-900-900"
+  },
+  "Ovation of the Seas": {
+    "file": "ovation.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/ovation-of-the-seas-northstar-aerial-1"
+  },
+  "Quantum of the Seas": {
+    "file": "quantum.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/quantum-of-the-seas-dusk-900-900"
+  },
+  "Radiance of the Seas": {
+    "file": "radiance.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/radiance-exterior-side-aerial-day-port-glaciers-ship"
+  },
+  "Serenade of the Seas": {
+    "file": "serenade.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/serenade-of-the-seas-ship-carousel-mobile-700-530_-900-900"
+  },
+  "Spectrum of the Seas": {
+    "file": "spectrum.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/spectrum-of-the-seas-aerial-skypad-hero-900-900"
+  },
+  "Vision of the Seas": {
+    "file": "vision.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/vision-exterior-front-aerial-day-port-ship-900-900"
+  },
+  "Voyager of the Seas": {
+    "file": "voyager.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/voyager-of-the-seas-ship-carousel-900-900"
+  },
+  "Rhapsody of the Seas": {
+    "file": "rhapsody.webp",
+    "source": "https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/rhapsody-of-the-seas-alaska-sailing-hero"
+  }
+}

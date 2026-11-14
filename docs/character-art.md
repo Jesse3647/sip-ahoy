@@ -1,0 +1,54 @@
+# Sailor character artwork
+
+Six locally bundled transparent 2×2 expression sheets, created with the built-in image-generation tool. Each square sheet contains ready (top left), cheerful (top right), merry (bottom left), and water-break (bottom right) poses. The app displays quadrants with CSS, preserving each original image's transparency. Runtime copies are resized to a maximum 768px edge.
+
+These are fictional cartoon expressions, not estimates of intoxication or impairment. Daily character behavior is defined in `src/characters.ts`.
+
+## skipper
+
+[Saved expression sheet](../public/characters/skipper.png)
+
+Final prompt:
+
+> Use case: stylized-concept. Asset type: production 2-by-2 square expression sprite sheet for a nautical app mascot. Create one square image divided into EXACTLY FOUR EQUAL SQUARE QUADRANTS, no visible dividers. Each quadrant contains the SAME original character: Skipper, a tangerine-orange octopus sea captain with six compact curled tentacles, ivory sailor cap with a cobalt wave emblem and cobalt neckerchief. Polished soft matte clay 3D toy illustration with rounded shapes, expressive face, saturated colors, soft studio light. Consistent character size, clothing, colors, framing and camera in all four cells. Show the entire compact character centered in each quadrant with at least 12% transparent padding on every side of its cell; no part may cross cell boundaries. Top LEFT: relaxed neutral smile, eyes open, calm friendly greeting. Top RIGHT: visibly delighted happy face, wide smile, lively raised arms or fins. Bottom LEFT: cheeky merry expression, one eye winking, open laughing smile, playful tilted head. Bottom RIGHT: visibly woozy comical expression with half-lidded slightly crossed eyes, rosy cheeks, tilted head and sheepish smile, cradling a small clear WATER bottle with aqua cap; a sleepy 'time for water' mood, still cute, not sick. Face differences should be obvious at small icon size. These are fictional cartoon expressions, not a health assessment. Transparent background across the entire sprite sheet, no ground, no shadows outside cells, NO TEXT, NO LABELS, no letters, no watermark, no extra characters. Strict square 2x2 layout with each character fully contained in its own equal square cell.
+
+## sunny
+
+[Saved expression sheet](../public/characters/sunny.png)
+
+Final prompt:
+
+> Use case: stylized-concept. Asset type: production 2-by-2 square expression sprite sheet for a nautical app mascot. Create one square image divided into EXACTLY FOUR EQUAL SQUARE QUADRANTS, no visible dividers. Each quadrant contains the SAME original character: Sunny, a cute mint-green sea turtle with a golden yellow shell, large expressive dark eyes, a little ivory sailor hat with cobalt trim and a tiny tangerine neckerchief. Polished soft matte clay 3D toy illustration with rounded shapes, expressive face, saturated colors, soft studio light. Consistent character size, clothing, colors, framing and camera in all four cells. Show the entire compact character centered in each quadrant with at least 12% transparent padding on every side of its cell; no part may cross cell boundaries. Top LEFT: relaxed neutral smile, eyes open, calm friendly greeting. Top RIGHT: visibly delighted happy face, wide smile, lively raised arms or fins. Bottom LEFT: cheeky merry expression, one eye winking, open laughing smile, playful tilted head. Bottom RIGHT: visibly woozy comical expression with half-lidded slightly crossed eyes, rosy cheeks, tilted head and sheepish smile, cradling a small clear WATER bottle with aqua cap; a sleepy 'time for water' mood, still cute, not sick. Face differences should be obvious at small icon size. These are fictional cartoon expressions, not a health assessment. Transparent background across the entire sprite sheet, no ground, no shadows outside cells, NO TEXT, NO LABELS, no letters, no watermark, no extra characters. Strict square 2x2 layout with each character fully contained in its own equal square cell.
+
+## pip
+
+[Saved expression sheet](../public/characters/pip.png)
+
+Final prompt:
+
+> Use case: stylized-concept. Asset type: production 2-by-2 square expression sprite sheet for a nautical app mascot. Create one square image divided into EXACTLY FOUR EQUAL SQUARE QUADRANTS, no visible dividers. Each quadrant contains the SAME original character: Pip, a charismatic round black-and-ivory puffin with an orange beak and feet, expressive dark eyes, a cobalt sailor cap and an aqua neckerchief. Polished soft matte clay 3D toy illustration with rounded shapes, expressive face, saturated colors, soft studio light. Consistent character size, clothing, colors, framing and camera in all four cells. Show the entire compact character centered in each quadrant with at least 12% transparent padding on every side of its cell; no part may cross cell boundaries. Top LEFT: relaxed neutral smile, eyes open, calm friendly greeting. Top RIGHT: visibly delighted happy face, wide smile, lively raised arms or fins. Bottom LEFT: cheeky merry expression, one eye winking, open laughing smile, playful tilted head. Bottom RIGHT: visibly woozy comical expression with half-lidded slightly crossed eyes, rosy cheeks, tilted head and sheepish smile, cradling a small clear WATER bottle with aqua cap; a sleepy 'time for water' mood, still cute, not sick. Face differences should be obvious at small icon size. These are fictional cartoon expressions, not a health assessment. Transparent background across the entire sprite sheet, no ground, no shadows outside cells, NO TEXT, NO LABELS, no letters, no watermark, no extra characters. Strict square 2x2 layout with each character fully contained in its own equal square cell.
+
+## finn
+
+[Saved expression sheet](../public/characters/finn.png)
+
+Final prompt:
+
+> Use case: stylized-concept. Asset type: production 2-by-2 square expression sprite sheet for a nautical app mascot. Create one square image divided into EXACTLY FOUR EQUAL SQUARE QUADRANTS, no visible dividers. Each quadrant contains the SAME original character: Finn, a friendly chubby sky-blue dolphin with a cream belly, expressive dark eyes, short flippers and tail, a tilted ivory sailor cap and a lemon-yellow neckerchief. Polished soft matte clay 3D toy illustration with rounded shapes, expressive face, saturated colors, soft studio light. Consistent character size, clothing, colors, framing and camera in all four cells. Show the entire compact character centered in each quadrant with at least 12% transparent padding on every side of its cell; no part may cross cell boundaries. Top LEFT: relaxed neutral smile, eyes open, calm friendly greeting. Top RIGHT: visibly delighted happy face, wide smile, lively raised arms or fins. Bottom LEFT: cheeky merry expression, one eye winking, open laughing smile, playful tilted head. Bottom RIGHT: visibly woozy comical expression with half-lidded slightly crossed eyes, rosy cheeks, tilted head and sheepish smile, cradling a small clear WATER bottle with aqua cap; a sleepy 'time for water' mood, still cute, not sick. Face differences should be obvious at small icon size. These are fictional cartoon expressions, not a health assessment. Transparent background across the entire sprite sheet, no ground, no shadows outside cells, NO TEXT, NO LABELS, no letters, no watermark, no extra characters. Strict square 2x2 layout with each character fully contained in its own equal square cell.
+
+## clawdia
+
+[Saved expression sheet](../public/characters/clawdia.png)
+
+Final prompt:
+
+> Use case: stylized-concept. Asset type: production 2-by-2 square expression sprite sheet for a nautical app mascot. Create one square image divided into EXACTLY FOUR EQUAL SQUARE QUADRANTS, no visible dividers. Each quadrant contains the SAME original character: Clawdia, a charming coral-pink crab with two round raised claws and four little legs, expressive dark eyes, an ivory sailor cap with cobalt trim and a tiny lilac neckerchief. Polished soft matte clay 3D toy illustration with rounded shapes, expressive face, saturated colors, soft studio light. Consistent character size, clothing, colors, framing and camera in all four cells. Show the entire compact character centered in each quadrant with at least 12% transparent padding on every side of its cell; no part may cross cell boundaries. Top LEFT: relaxed neutral smile, eyes open, calm friendly greeting. Top RIGHT: visibly delighted happy face, wide smile, lively raised arms or fins. Bottom LEFT: cheeky merry expression, one eye winking, open laughing smile, playful tilted head. Bottom RIGHT: visibly woozy comical expression with half-lidded slightly crossed eyes, rosy cheeks, tilted head and sheepish smile, cradling a small clear WATER bottle with aqua cap; a sleepy 'time for water' mood, still cute, not sick. Face differences should be obvious at small icon size. These are fictional cartoon expressions, not a health assessment. Transparent background across the entire sprite sheet, no ground, no shadows outside cells, NO TEXT, NO LABELS, no letters, no watermark, no extra characters. Strict square 2x2 layout with each character fully contained in its own equal square cell.
+
+## pearl
+
+[Saved expression sheet](../public/characters/pearl.png)
+
+Final prompt:
+
+> Use case: stylized-concept. Asset type: production 2-by-2 square expression sprite sheet for a nautical app mascot. Create one square image divided into EXACTLY FOUR EQUAL SQUARE QUADRANTS, no visible dividers. Each quadrant contains the SAME original character: Pearl, a charming lilac-purple seahorse with a cream belly, curled tail, expressive dark eyes, aqua fins, and a tiny ivory sailor cap with cobalt trim. Polished soft matte clay 3D toy illustration with rounded shapes, expressive face, saturated colors, soft studio light. Consistent character size, clothing, colors, framing and camera in all four cells. Show the entire compact character centered in each quadrant with at least 12% transparent padding on every side of its cell; no part may cross cell boundaries. Top LEFT: relaxed neutral smile, eyes open, calm friendly greeting. Top RIGHT: visibly delighted happy face, wide smile, lively raised arms or fins. Bottom LEFT: cheeky merry expression, one eye winking, open laughing smile, playful tilted head. Bottom RIGHT: visibly woozy comical expression with half-lidded slightly crossed eyes, rosy cheeks, tilted head and sheepish smile, cradling a small clear WATER bottle with aqua cap; a sleepy 'time for water' mood, still cute, not sick. Face differences should be obvious at small icon size. These are fictional cartoon expressions, not a health assessment. Transparent background across the entire sprite sheet, no ground, no shadows outside cells, NO TEXT, NO LABELS, no letters, no watermark, no extra characters. Strict square 2x2 layout with each character fully contained in its own equal square cell.
+

@@ -9,6 +9,8 @@ import { PricingBreakdown } from "../PackagePricing";
 import { dateLabel } from "../formatting";
 import { drinkIcon } from "./DrinkIcon";
 import { Empty } from "./ui";
+import { characterFor } from "../characters";
+import { CharacterPortrait } from "./CharacterPortrait";
 
 /** Inputs for LogRow. */
 type LogRowProps = {
@@ -75,8 +77,11 @@ export function PackageCards({ crew, sailing, entries }: PackageCardsProps) {
         return (
           <div className="package-person" key={traveler.id}>
             <div className="package-top">
-              <span className="avatar" style={{ background: traveler.color }}>
-                {traveler.name.slice(0, 1)}
+              <span className="avatar sailor-avatar">
+                <CharacterPortrait
+                  characterId={characterFor(traveler)}
+                  decorative
+                />
               </span>
               <div>
                 <strong>{traveler.name}</strong>
