@@ -1,0 +1,261 @@
+{
+  "retrievedAt": "2026-11-14",
+  "menus": [
+    {
+      "sourceUrl": "https://candidcruisetravel.com/cafe-promenade-menu-on-royal-caribbean/",
+      "venue": "Café Promenade",
+      "ships": [
+        "Voyager of the Seas",
+        "Explorer of the Seas",
+        "Adventure of the Seas",
+        "Mariner of the Seas",
+        "Navigator of the Seas",
+        "Freedom of the Seas",
+        "Liberty of the Seas",
+        "Independence of the Seas",
+        "Quantum of the Seas",
+        "Anthem of the Seas",
+        "Ovation of the Seas",
+        "Odyssey of the Seas",
+        "Oasis of the Seas",
+        "Allure of the Seas",
+        "Harmony of the Seas",
+        "Symphony of the Seas",
+        "Wonder of the Seas",
+        "Utopia of the Seas"
+      ],
+      "items": [
+        {
+          "name": "Cappuccino (small)",
+          "category": "Coffee",
+          "priceCents": 425
+        },
+        {
+          "name": "Cappuccino (medium)",
+          "category": "Coffee",
+          "priceCents": 450
+        },
+        {
+          "name": "Cappuccino (large)",
+          "category": "Coffee",
+          "priceCents": 500
+        },
+        {
+          "name": "Café Americano (small)",
+          "category": "Coffee",
+          "priceCents": 300
+        },
+        {
+          "name": "Café Americano (medium)",
+          "category": "Coffee",
+          "priceCents": 350
+        },
+        {
+          "name": "Café Americano (large)",
+          "category": "Coffee",
+          "priceCents": 375
+        },
+        {
+          "name": "Café Latte (small)",
+          "category": "Coffee",
+          "priceCents": 425
+        },
+        {
+          "name": "Café Latte (medium)",
+          "category": "Coffee",
+          "priceCents": 450
+        },
+        {
+          "name": "Café Latte (large)",
+          "category": "Coffee",
+          "priceCents": 500
+        },
+        {
+          "name": "Café Mocha (small)",
+          "category": "Coffee",
+          "priceCents": 425
+        },
+        {
+          "name": "Café Mocha (medium)",
+          "category": "Coffee",
+          "priceCents": 500
+        },
+        {
+          "name": "Café Mocha (large)",
+          "category": "Coffee",
+          "priceCents": 550
+        },
+        {
+          "name": "Espresso (small)",
+          "category": "Coffee",
+          "priceCents": 275
+        },
+        {
+          "name": "Espresso (large)",
+          "category": "Coffee",
+          "priceCents": 325
+        },
+        {
+          "name": "Tazo Hot Tea (small)",
+          "category": "Tea",
+          "priceCents": 200
+        },
+        {
+          "name": "Tazo Hot Tea (medium)",
+          "category": "Tea",
+          "priceCents": 225
+        },
+        {
+          "name": "Tazo Hot Tea (large)",
+          "category": "Tea",
+          "priceCents": 250
+        },
+        {
+          "name": "Tazo Tea Latte (small)",
+          "category": "Tea",
+          "priceCents": 400
+        },
+        {
+          "name": "Tazo Tea Latte (medium)",
+          "category": "Tea",
+          "priceCents": 450
+        },
+        {
+          "name": "Tazo Tea Latte (large)",
+          "category": "Tea",
+          "priceCents": 475
+        },
+        {
+          "name": "Hot Chocolate (small)",
+          "category": "Other",
+          "priceCents": 350
+        },
+        {
+          "name": "Hot Chocolate (medium)",
+          "category": "Other",
+          "priceCents": 400
+        },
+        {
+          "name": "Hot Chocolate (large)",
+          "category": "Other",
+          "priceCents": 450
+        },
+        {
+          "name": "Caramel Macchiato (small)",
+          "category": "Coffee",
+          "priceCents": 500
+        },
+        {
+          "name": "Caramel Macchiato (medium)",
+          "category": "Coffee",
+          "priceCents": 525
+        },
+        {
+          "name": "Caramel Macchiato (large)",
+          "category": "Coffee",
+          "priceCents": 550
+        },
+        {
+          "name": "White Chocolate Mocha (small)",
+          "category": "Coffee",
+          "priceCents": 500
+        },
+        {
+          "name": "White Chocolate Mocha (medium)",
+          "category": "Coffee",
+          "priceCents": 525
+        },
+        {
+          "name": "White Chocolate Mocha (large)",
+          "category": "Coffee",
+          "priceCents": 575
+        },
+        {
+          "name": "Iced Café Latte",
+          "category": "Coffee",
+          "priceCents": 450
+        },
+        {
+          "name": "Iced Café Mocha",
+          "category": "Coffee",
+          "priceCents": 500
+        },
+        {
+          "name": "Iced Café Americano",
+          "category": "Coffee",
+          "priceCents": 350
+        },
+        {
+          "name": "Tazo Chai Tea Latte",
+          "category": "Tea",
+          "priceCents": 450
+        },
+        {
+          "name": "Coffee Frappuccino",
+          "category": "Coffee",
+          "priceCents": 500
+        },
+        {
+          "name": "Mocha Frappuccino",
+          "category": "Coffee",
+          "priceCents": 550
+        },
+        {
+          "name": "Caramel Frappuccino",
+          "category": "Coffee",
+          "priceCents": 550
+        }
+      ]
+    },
+    {
+      "sourceUrl": "https://cruiseprism.com/royal-caribbean-vitality-cafe-menu/",
+      "venue": "Vitality Café",
+      "ships": [
+        "Oasis of the Seas",
+        "Symphony of the Seas"
+      ],
+      "items": [
+        {
+          "name": "Apple Mint (12 oz)",
+          "category": "Juice",
+          "priceCents": 825
+        },
+        {
+          "name": "Fruit Oasis (12 oz)",
+          "category": "Juice",
+          "priceCents": 825
+        },
+        {
+          "name": "Caliente Carrot (12 oz)",
+          "category": "Juice",
+          "priceCents": 825
+        },
+        {
+          "name": "Carrot Lemonade (12 oz)",
+          "category": "Juice",
+          "priceCents": 825
+        },
+        {
+          "name": "Build-Your-Own Juice (12 oz)",
+          "category": "Juice",
+          "priceCents": 825
+        },
+        {
+          "name": "Power Shake (12 oz)",
+          "category": "Smoothie",
+          "priceCents": 825
+        },
+        {
+          "name": "Muscle Building (12 oz)",
+          "category": "Smoothie",
+          "priceCents": 825
+        },
+        {
+          "name": "Build-Your-Own Fruit Smoothie (12 oz)",
+          "category": "Smoothie",
+          "priceCents": 825
+        }
+      ]
+    }
+  ]
+}

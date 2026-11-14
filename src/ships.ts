@@ -1,0 +1,37 @@
+// Royal Caribbean International ships, verified 2026-11-14.
+// Source: https://www.royalcaribbean.com/faq/questions/how-many-ships-are-in-royal-caribbeans-fleet
+// Bundled locally so sailing setup continues to work offline.
+/** Offline ship choices for sailing setup; includes announced ships in the dated source snapshot. */
+export const royalCaribbeanShips = [
+  "Adventure of the Seas",
+  "Allure of the Seas",
+  "Anthem of the Seas",
+  "Brilliance of the Seas",
+  "Enchantment of the Seas",
+  "Explorer of the Seas",
+  "Freedom of the Seas",
+  "Grandeur of the Seas",
+  "Harmony of the Seas",
+  "Hero of the Seas",
+  "Icon of the Seas",
+  "Independence of the Seas",
+  "Jewel of the Seas",
+  "Legend of the Seas",
+  "Liberty of the Seas",
+  "Mariner of the Seas",
+  "Navigator of the Seas",
+  "Oasis of the Seas",
+  "Odyssey of the Seas",
+  "Ovation of the Seas",
+  "Quantum of the Seas",
+  "Radiance of the Seas",
+  "Rhapsody of the Seas",
+  "Serenade of the Seas",
+  "Spectrum of the Seas",
+  "Star of the Seas",
+  "Symphony of the Seas",
+  "Utopia of the Seas",
+  "Vision of the Seas",
+  "Voyager of the Seas",
+  "Wonder of the Seas",
+] as const;
