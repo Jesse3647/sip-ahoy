@@ -254,86 +254,27 @@ test("iOS touch guard blocks top-edge pulls while preserving inner scrolling and
   });
 });
 
-for (const outcome of ["shared", "cancelled", "error"] as const) {
-  test(`iOS Open Share handles ${outcome} without claiming installation`, async ({
-    page,
-  }) => {
-    await simulateIOS(page);
-    await page.addInitScript((outcome) => {
-      Object.defineProperty(navigator, "share", {
-        configurable: true,
-        value: async (data: ShareData) => {
-          (window as unknown as { shared: ShareData }).shared = data;
-          if (outcome === "cancelled")
-            throw new DOMException("Cancelled", "AbortError");
-          if (outcome === "error")
-            throw new DOMException("Unavailable", "NotAllowedError");
-        },
-      });
-    }, outcome);
-    await page.setViewportSize({ width: 320, height: 740 });
-    await page.goto("/");
-    const offer = page.getByRole("complementary", {
-      name: "Add SipAhoy to your Home Screen",
-    });
-    await offer
-      .getByRole("button", { name: "Open Share", exact: true })
-      .click();
-    await expect(
-      offer.getByRole("button", { name: "Open Share", exact: true }),
-    ).toBeEnabled();
-    expect(
-      await page.evaluate(
-        () => (window as unknown as { shared: ShareData }).shared,
-      ),
-    ).toEqual({ title: "SipAhoy", url: "http://127.0.0.1:4173/" });
-    await expect(offer).toBeVisible();
-    if (outcome === "error")
-      await expect(offer.getByRole("alert")).toContainText(
-        "Safari’s own Share button",
-      );
-    else await expect(offer.getByRole("alert")).toHaveCount(0);
-    await expect(
-      page.getByText("Installation requested.", { exact: false }),
-    ).toHaveCount(0);
-    expect(await offer.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(
-      true,
-    );
-    await offer.getByRole("button", { name: "Show me how" }).click();
-    const guide = page.getByRole("dialog", { name: "Install SipAhoy" });
-    await expect(
-      guide.getByRole("button", { name: "Open Share", exact: true }),
-    ).toBeVisible();
-    await expect(guide).toContainText(
-      outcome === "error"
-        ? "Couldn’t open Share"
-        : "If Add to Home Screen isn’t listed",
-    );
-    await guide
-      .getByRole("button", { name: "Open Share", exact: true })
-      .click();
-    await expect(
-      guide.getByRole("button", { name: "Open Share", exact: true }),
-    ).toBeEnabled();
-  });
-}
-
-test("iOS retains instructions when native sharing is unavailable", async ({
+test("iOS uses instructions even when native sharing is available", async ({
   page,
 }) => {
   await simulateIOS(page);
   await page.addInitScript(() =>
-    Object.defineProperty(navigator, "share", { value: undefined }),
+    Object.defineProperty(navigator, "share", {
+      value: async () => {
+        throw new Error("Sharing must not be used for installation");
+      },
+    }),
   );
   await page.goto("/");
-  await expect(page.getByRole("button", { name: "Show me how" })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Open Share", exact: true }),
   ).toHaveCount(0);
   await page.getByRole("button", { name: "Show me how" }).click();
+  const guide = page.getByRole("dialog", { name: "Install SipAhoy" });
+  await expect(guide).toContainText("Add to Home Screen");
   await expect(
-    page.getByRole("dialog", { name: "Install SipAhoy" }),
-  ).toContainText("Add to Home Screen");
+    guide.getByRole("button", { name: "Open Share", exact: true }),
+  ).toHaveCount(0);
 });
 
 test("installation icons cover the complete square and all manifest candidates support masking", async ({
@@ -353,8 +294,13 @@ test("installation icons cover the complete square and all manifest candidates s
       purpose: string;
       sizes: string;
     }[];
+    const touchLinks = [
+      ...document.querySelectorAll<HTMLLinkElement>(
+        'link[rel="apple-touch-icon"]',
+      ),
+    ];
     const urls = [
-      touchLink.href,
+      ...touchLinks.map((link) => link.href),
       ...icons.map((icon) => new URL(icon.src, manifestLink.href).href),
     ];
     const corners = await Promise.all(
@@ -375,9 +321,29 @@ test("installation icons cover the complete square and all manifest candidates s
         ].map(([x, y]) => [...ctx.getImageData(x, y, 1, 1).data]);
       }),
     );
-    return { touch: touchLink.href, icons, corners };
+    const colorTypes = await Promise.all(
+      urls.map(
+        async (url) =>
+          new Uint8Array(await (await fetch(url)).arrayBuffer())[25],
+      ),
+    );
+    return {
+      touch: touchLink.href,
+      icons,
+      corners,
+      colorTypes,
+      sizes: touchLinks.map((link) => link.sizes.value),
+    };
   });
-  expect(result.touch).toContain("apple-touch-icon-v2.png");
+  expect(result.touch).toContain("apple-touch-icon-180.png");
+  expect(result.sizes).toEqual([
+    "",
+    "120x120",
+    "152x152",
+    "167x167",
+    "180x180",
+  ]);
+  expect(result.colorTypes.every((type) => type === 2)).toBe(true);
   expect(result.icons.some((icon) => icon.sizes === "1024x1024")).toBe(true);
   expect(
     result.icons.every((icon) => icon.purpose.split(" ").includes("maskable")),

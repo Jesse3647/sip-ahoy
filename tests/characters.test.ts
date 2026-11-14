@@ -8,85 +8,118 @@ import {
   type Entry,
 } from "../src/model";
 
-describe("sailor characters and cosmetic daily reactions", () => {
-  it("counts only this sailor, sailing, and selected day", () => {
-    const data = demoData(),
-      sailor = data.travelers[0],
-      day = data.sailings[0].start;
-    const base = {
-      ...data.entries[0],
-      travelerId: sailor.id,
-      sailingId: sailor.sailingId,
-      sailingDate: day,
-      category: "Cocktail" as const,
-    };
-    expect(sailorReaction(sailor, [], day).mood).toBe("ready");
-    expect(sailorReaction(sailor, [base], day)).toEqual({
-      mood: "cheerful",
-      total: 1,
-      alcohol: 1,
-    });
-    const mixed = [
-      base,
-      { ...base, travelerId: "someone-else" },
-      { ...base, sailingId: "another-trip" },
-      { ...base, sailingDate: "1999-01-01" },
-    ];
-    expect(sailorReaction(sailor, mixed, day)).toEqual({
-      mood: "cheerful",
-      total: 1,
-      alcohol: 1,
-    });
+describe("sailor characters and live cosmetic reactions", () => {
+  const now = Date.parse("2026-11-15T02:00:00Z");
+  const data = demoData();
+  const sailor = data.travelers[0];
+  const entry = (
+    hours = 0,
+    category: Entry["category"] = "Cocktail",
+  ): Entry => ({
+    ...data.entries[0],
+    travelerId: sailor.id,
+    sailingId: sailor.sailingId,
+    sailingDate: "2026-11-14",
+    category,
+    time: new Date(now - hours * 3600000).toISOString(),
   });
-  it("changes expressions at cosmetic thresholds and never treats nonalcoholic categories as alcohol", () => {
-    const data = demoData(),
-      sailor = data.travelers[0],
-      day = data.sailings[0].start;
-    const entry = {
-      ...data.entries[0],
-      travelerId: sailor.id,
-      sailingId: sailor.sailingId,
-      sailingDate: day,
-    };
-    const alcohol = ["Cocktail", "Beer", "Wine", "Spirit", "Cocktail"].map(
-      (category, i) => ({
-        ...entry,
-        id: String(i),
-        category: category as Entry["category"],
-      }),
-    );
-    expect(sailorReaction(sailor, alcohol.slice(0, 2), day).mood).toBe(
+  it("stays ready without recent drinks and counts only this sailor and sailing", () => {
+    expect(sailorReaction(sailor, [], now)).toEqual({
+      mood: "ready",
+      total: 0,
+      alcohol: 0,
+    });
+    expect(
+      sailorReaction(
+        sailor,
+        [
+          entry(),
+          { ...entry(), travelerId: "other" },
+          { ...entry(), sailingId: "other" },
+        ],
+        now,
+      ),
+    ).toEqual({ mood: "cheerful", total: 1, alcohol: 1 });
+    expect(sailorReaction(sailor, [entry(7)], now).mood).toBe("ready");
+    expect(sailorReaction(sailor, [entry(0, "Water")], now).mood).toBe(
       "cheerful",
     );
-    expect(sailorReaction(sailor, alcohol.slice(0, 3), day).mood).toBe("merry");
-    expect(sailorReaction(sailor, alcohol.slice(0, 4), day).mood).toBe("merry");
-    expect(sailorReaction(sailor, alcohol, day).mood).toBe("water");
-    const nonAlcohol = [
+  });
+  it("uses a continuously rolling window across midnight, excludes future logs and expires exactly at six hours", () => {
+    const logs = [
+      entry(5.999),
+      entry(6),
+      entry(6.001),
+      entry(-1),
+      { ...entry(1), sailingDate: "2026-11-15" },
+    ];
+    expect(sailorReaction(sailor, logs, now)).toEqual({
+      mood: "cheerful",
+      total: 2,
+      alcohol: 2,
+    });
+    expect(sailorReaction(sailor, [entry(5.999)], now + 4000).mood).toBe(
+      "ready",
+    );
+    expect(
+      sailorReaction(
+        sailor,
+        [{ ...entry(), time: "2026-11-14T21:00:00-05:00" }],
+        now,
+      ).total,
+    ).toBe(1);
+  });
+  it("uses three for merry and six for woozy, with one point removed per recent water", () => {
+    const logs = Array.from({ length: 6 }, (_, i) => ({
+      ...entry(i / 2),
+      id: String(i),
+    }));
+    expect(sailorReaction(sailor, logs.slice(0, 2), now).mood).toBe("cheerful");
+    expect(sailorReaction(sailor, logs.slice(0, 3), now).mood).toBe("merry");
+    expect(sailorReaction(sailor, logs.slice(0, 5), now).mood).toBe("merry");
+    expect(sailorReaction(sailor, logs, now).mood).toBe("water");
+    const water = entry(0, "Water");
+    expect(sailorReaction(sailor, [...logs, water], now)).toEqual({
+      mood: "merry",
+      total: 7,
+      alcohol: 6,
+    });
+    expect(
+      sailorReaction(sailor, [...logs, ...Array(9).fill(water)], now).mood,
+    ).toBe("cheerful");
+    expect(
+      sailorReaction(sailor, [...logs, { ...water, time: entry(6).time }], now)
+        .mood,
+    ).toBe("water");
+    for (const category of [
       "Coffee",
-      "Water",
       "Mocktail",
       "Soft drink",
       "Tea",
       "Juice",
       "Smoothie",
       "Other",
-    ].map((category) => ({
-      ...entry,
-      category: category as Entry["category"],
-    }));
-    expect(sailorReaction(sailor, nonAlcohol, day)).toEqual({
-      mood: "cheerful",
-      total: 8,
-      alcohol: 0,
-    });
-    expect(sailorReaction(sailor, [...alcohol, ...nonAlcohol], day).mood).toBe(
-      "water",
-    );
-    // Removing or editing a log recalculates immediately; no cached mood or lifetime counter.
-    expect(sailorReaction(sailor, alcohol.slice(0, 2), day).mood).toBe(
-      "cheerful",
-    );
-    expect(sailorReaction(sailor, alcohol, "1999-01-01").mood).toBe("ready");
+    ] as const) {
+      expect(
+        sailorReaction(sailor, [...logs, entry(0, category)], now).mood,
+      ).toBe("water");
+    }
+  });
+  it("recomputes after edits/deletion and as water and alcohol expire independently", () => {
+    const logs = Array.from({ length: 6 }, () => entry(0));
+    expect(
+      sailorReaction(sailor, [...logs, entry(5.5, "Water")], now).mood,
+    ).toBe("merry");
+    expect(
+      sailorReaction(sailor, [...logs, entry(5.5, "Water")], now + 3600000)
+        .mood,
+    ).toBe("water");
+    expect(sailorReaction(sailor, logs.slice(1), now).mood).toBe("merry");
+    expect(
+      sailorReaction(sailor, [...logs.slice(1), entry(0, "Mocktail")], now)
+        .mood,
+    ).toBe("merry");
+    expect(sailorReaction(sailor, logs, now + 6 * 3600000).mood).toBe("ready");
   });
   it("preserves every assignment in version-six backups and accepts earlier journals", () => {
     for (const characterId of characterIds) {

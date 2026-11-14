@@ -2,7 +2,7 @@
 
 Six locally bundled transparent 2×2 expression sheets, created with the built-in image-generation tool. Each square sheet contains ready (top left), cheerful (top right), merry (bottom left), and water-break (bottom right) poses. The app displays quadrants with CSS, preserving each original image's transparency. Runtime copies are resized to a maximum 768px edge.
 
-These are fictional cartoon expressions, not estimates of intoxication or impairment. Daily character behavior is defined in `src/characters.ts`.
+These are fictional cartoon expressions, not estimates of intoxication or impairment. Live character behavior is defined in `src/characters.ts`. Each sailor/sailing uses logs whose saved timestamp is within `(now − 6 hours, now]`, including across midnight. No recent drinks means ready. Otherwise the cosmetic score is `max(0, alcoholic logs − Water-category logs)`: 0–2 is cheerful, 3–5 is merry, and 6+ is the woozy water-break pose. Other nonalcoholic categories do not reduce the score. This score is not BAC or impairment; water does not lower alcohol levels. Log edits retain their recorded timestamp. The former Character day selector is removed because reactions are live; journal date analytics remain unchanged. The app refreshes at expiration boundaries and on focus/visibility changes, with a minute heartbeat as a fallback.
 
 ## skipper
 

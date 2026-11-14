@@ -47,34 +47,6 @@ export function useInstallApp() {
     "idle" | "prompting" | "accepted" | "dismissed" | "error"
   >("idle");
   const installing = useRef(false);
-  const [shareStatus, setShareStatus] = useState<
-    "idle" | "sharing" | "shared" | "error"
-  >("idle");
-  const sharing = useRef(false);
-  const canShare =
-    isIOS() && window.isSecureContext && typeof navigator.share === "function";
-  const openShare = async () => {
-    if (!canShare || installed || sharing.current) return;
-    sharing.current = true;
-    setShareStatus("sharing");
-    try {
-      // Call directly in the click handler to preserve Safari's user activation.
-      // This opens sharing UI; it does not prove that the app was installed.
-      await navigator.share({
-        title: "SipAhoy",
-        url: new URL(import.meta.env.BASE_URL, location.origin).href,
-      });
-      setShareStatus("shared");
-    } catch (error) {
-      setShareStatus(
-        error instanceof Error && error.name === "AbortError"
-          ? "idle"
-          : "error",
-      );
-    } finally {
-      sharing.current = false;
-    }
-  };
   const installationObserved = useRef(false);
   useEffect(() => {
     const modes = displayModes.map((mode) =>
@@ -122,9 +94,6 @@ export function useInstallApp() {
     canPrompt: !!promptEvent,
     status,
     install,
-    canShare,
-    openShare,
-    shareStatus,
     showIOSOffer: iosOffer && !installed,
     dismissIOSOffer,
   };

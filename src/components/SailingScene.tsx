@@ -8,12 +8,12 @@ import { SailorBlink } from "./SailorBlink";
 export function SailingScene({
   crew,
   entries,
-  day,
+  now,
   selectedId,
 }: {
   crew: Traveler[];
   entries: Entry[];
-  day: string;
+  now: number;
   selectedId?: string;
 }) {
   const [active, setActive] = useState(false);
@@ -54,12 +54,13 @@ export function SailingScene({
       />
       <div className="portrait-crew" data-count={visibleCrew.length}>
         {visibleCrew.map((sailor, index) => {
-          const { mood } = sailorReaction(sailor, entries, day);
+          const { mood } = sailorReaction(sailor, entries, now);
           const characterId = characterFor(sailor);
           return (
             <figure
               className="sailor-closeup"
               key={sailor.id}
+              aria-label={`${sailor.name} · ${moods[mood].label}`}
               data-selected={sailor.id === selected?.id}
               style={
                 {
@@ -78,10 +79,6 @@ export function SailingScene({
                   <SailorBlink characterId={characterId} mood={mood} />
                 </div>
               </div>
-              <figcaption>
-                <strong>{sailor.name}</strong>
-                <span>{moods[mood].label}</span>
-              </figcaption>
             </figure>
           );
         })}

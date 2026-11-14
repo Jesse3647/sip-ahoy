@@ -20,6 +20,12 @@ npm run preview -- --base=/sip-ahoy/
 
 Open the preview server's `/sip-ahoy/` URL. Journal data stays in the browser; publishing does not transfer local preview data to the hosted site. Use a JSON backup and restore to move a journal between origins.
 
+## License and image credits
+
+SipAhoy's original software is available under the [MIT License](LICENSE), also linked from the app footer as **Open source · MIT License**. Third-party dependencies retain their own licenses.
+
+Official ship photography and renderings are © Royal Caribbean International and are **not covered by the MIT License**. See [third-party notices and individual image sources](public/THIRD_PARTY_NOTICES.txt) and [ship artwork documentation](docs/ship-artwork.md). The illustrated pool-deck scene and sailor characters are original generated artwork, not official Royal Caribbean imagery. SipAhoy is an independent project, not affiliated with or endorsed by Royal Caribbean.
+
 ## Project direction
 
 - The web app is a complete product: no account, backend, or paid Apple Developer Program required for the MVP.
@@ -82,6 +88,35 @@ This README is the project ledger. Update the milestone checkboxes and progress 
 - Consider opt-in backend sync/shared catalogs only if file backups and nearby sharing prove insufficient. Local-only usage must remain available.
 
 ## Progress log
+
+### 2026-11-14 — MIT footer and ship image credits
+
+- Added the MIT license with the software copyright notice, plus a public LICENSE.txt linked as “Open source · MIT License” in the footer, matching hexagon-display. Added a footer copyright callout for Royal Caribbean International and retained the image-level source credits.
+- Published third-party notices with all 31 ship image source URLs and a clear exclusion of third-party material from the MIT grant. The notices distinguish official ship photography/renderings from the app's original generated scene/character artwork. Both text documents are precached for offline reading.
+- Validation: GitHub Pages production build passed; footer layouts were checked at 320, 390, and 1280px. License and attribution links returned the correct text online and offline.
+
+### 2026-11-14 — Live six-hour character reactions
+
+- Replaced selected-day reactions with a rolling six-hour window of saved timestamps per sailor and sailing, including across midnight. Removed the Character day selector; daily journal analytics remain unchanged. No recent drinks means ready; otherwise `max(0, alcoholic logs − waters)` yields smiling at 0–2, merry at 3–5, and the woozy water-break pose at 6+. Other nonalcoholic drinks do not subtract points.
+- Schedule reaction refreshes when entries expire, on focus/visibility changes, and at least every minute. Saves, edits, deletes, and restores recalculate immediately. Water affects only the cosmetic score; no alcohol-level gauge or impairment estimate is included.
+- Validation: 41 unit tests and all eight character/save-feedback browser scenarios passed. Coverage includes exact six-hour expiry, future timestamps, midnight/timezone boundaries, independent sailors/sailings, water expiry increasing the score, alcohol expiry returning to ready without another save, edits/deletes, offline use, and character layouts.
+
+### 2026-11-14 — Caption-free banner with room for hats
+
+- Removed visible names and mood labels beneath banner characters, preserving that information in accessible figure labels. Limited sprite size to the scene height with 12px of clearance so a solo sailor's hat cannot be pushed outside the frame. The crew selector retains its names and moods.
+- Validation: production build and all four character browser scenarios passed. Bounds checks cover paired sailors at phone/tablet/desktop widths and a solo sailor at 320, 390, 640, 768, and 1440px. Reviewed the solo dolphin at 640px with its full hat visible.
+
+### 2026-11-14 — Unclipped sailors and readable pool-deck scenery
+
+- Removed each banner sailor's clipping boundary and sized complete square expression frames to overlap within the shared scene. The selected sailor layers in front; names stay aligned beneath their own character. The clearer background uses the original illustration without extra zoom, blur, or desaturation, retaining a light gradient for the captions.
+- Restricted the save-notification text-height rule to the drink name. It previously also applied to the portrait's span, shrinking the character's sprite frame. The notification now uses a square, vertically centered portrait, with centering kept separate from the reaction animation.
+- Validation: production build passed. Character coverage verifies overlapping frame bounds at 320px, 390px, 768px, and desktop sizes, all six sailors and daily expressions, reduced motion, blinking, and offline artwork. Mobile navigation/dialog checks passed. Updated phone and desktop banner screenshots were visually reviewed.
+
+### 2026-11-14 — Installation sheet and explicit iOS icons
+
+- Replaced the installation guide's decorative grip with the same pointer-driven sheet behavior as navigation. The guide supports expansion, native content scrolling, and drag dismissal while keeping the handle visible in landscape. Other editor dialogs retain their existing behavior.
+- Removed Open Share and its installation-specific sharing logic. Native sharing does not expose Safari's Add to Home Screen action; the manual guide and browser-native install prompts on supported platforms remain.
+- Verified the deployed Apple touch and manifest icon URLs return the correct glass PNGs with image content types, matching local files byte for byte. The reported scene in Safari's Add to Home Screen preview remains a device-specific fallback issue, not a scene asset configured as an icon. Added explicit standard iPhone/iPad icon sizes, iOS app metadata, fresh icon URLs, and RGB PNG encoding without an alpha channel to improve compatibility. The exact iOS cause and final preview still require physical-device verification.
 
 ### 2026-11-14 — Install icon selection, quiet handle focus, and native sharing
 

@@ -38,31 +38,37 @@ export function characterFor(traveler?: Traveler): CharacterId {
   return characterIds[hash % characterIds.length];
 }
 
-/** Cosmetic reactions only. Counts are per sailor, sailing, and selected calendar day, never an impairment estimate. */
+export const reactionWindowMs = 6 * 60 * 60 * 1000;
+
+/** Live, cosmetic reactions only. Water changes this animation score, never an impairment estimate. */
 export function sailorReaction(
   traveler: Traveler,
   entries: Entry[],
-  day: string,
+  now = Date.now(),
 ): { mood: CharacterMood; total: number; alcohol: number } {
-  const daily = entries.filter(
-    (entry) =>
+  const recent = entries.filter((entry) => {
+    const time = Date.parse(entry.time);
+    return (
       entry.travelerId === traveler.id &&
       entry.sailingId === traveler.sailingId &&
-      entry.sailingDate === day,
-  );
-  const alcohol = daily.filter((entry) =>
+      time > now - reactionWindowMs &&
+      time <= now
+    );
+  });
+  const alcohol = recent.filter((entry) =>
     ["Cocktail", "Beer", "Wine", "Spirit"].includes(entry.category),
   ).length;
+  const waters = recent.filter((entry) => entry.category === "Water").length;
+  const score = Math.max(0, alcohol - waters);
   return {
-    total: daily.length,
+    total: recent.length,
     alcohol,
-    mood:
-      alcohol >= 5
+    mood: !recent.length
+      ? "ready"
+      : score >= 6
         ? "water"
-        : alcohol >= 3
+        : score >= 3
           ? "merry"
-          : daily.length
-            ? "cheerful"
-            : "ready",
+          : "cheerful",
   };
 }

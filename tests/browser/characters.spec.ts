@@ -123,7 +123,7 @@ test("each sailor keeps an independent character through reload, backup restore,
   ).toBeChecked();
 });
 
-test("daily reactions update per sailor after saves and removals without leaking between days", async ({
+test("live reactions update per sailor after saves and removals", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -132,15 +132,15 @@ test("daily reactions update per sailor after saves and removals without leaking
   const sailor = fixture.travelers[0];
   const day = fixture.sailings[0].start;
   const cocktail = fixture.entries.find((e) => e.category === "Cocktail")!;
-  fixture.entries = Array.from({ length: 4 }, (_, i) => ({
+  fixture.entries = Array.from({ length: 5 }, (_, i) => ({
     ...cocktail,
     id: `daily-${i}`,
+    time: new Date().toISOString(),
     travelerId: sailor.id,
     sailingId: sailor.sailingId,
     sailingDate: day,
   }));
   await restore(page, fixture);
-  await page.getByLabel("Character day", { exact: true }).fill(day);
   const alex = page.getByRole("button", {
     name: "Show Alex's character",
     exact: true,
@@ -191,14 +191,6 @@ test("daily reactions update per sailor after saves and removals without leaking
     path: "test-results/sailor-daily-reactions.png",
     animations: "disabled",
   });
-  await page
-    .getByLabel("Character day", { exact: true })
-    .fill(fixture.sailings[0].end);
-  await expect(alex.locator(".character-portrait")).toHaveAttribute(
-    "data-mood",
-    "ready",
-  );
-  await page.getByLabel("Character day", { exact: true }).fill(day);
   await navigate(page, "Drink log");
   page.once("dialog", (dialog) => dialog.accept());
   await page
@@ -244,16 +236,16 @@ test("sailor close-ups are passive, blink without body motion, and stay availabl
     (entry) => entry.category === "Cocktail",
   )!;
   fixture.entries = fixture.travelers.flatMap((sailor, index) =>
-    Array.from({ length: [0, 1, 3, 5, 0, 1][index] }, (_, n) => ({
+    Array.from({ length: [0, 1, 3, 6, 0, 1][index] }, (_, n) => ({
       ...cocktail,
       id: `${sailor.id}-${n}`,
       travelerId: sailor.id,
       sailingId: sailor.sailingId,
       sailingDate: day,
+      time: new Date().toISOString(),
     })),
   );
   await restore(page, fixture);
-  await page.getByLabel("Character day", { exact: true }).fill(day);
   const scene = page.locator(".sailing-scene");
   await scene.scrollIntoViewIfNeeded();
   await expect(
@@ -285,18 +277,31 @@ test("sailor close-ups are passive, blink without body motion, and stay availabl
   await page
     .getByRole("button", { name: "Show Alex's character", exact: true })
     .click();
-  for (const width of [1440, 390, 320]) {
+  for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.evaluate(() => window.scrollTo(0, 0));
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth),
     ).toBeLessThanOrEqual(width);
-    await page
-      .locator(".hero")
-      .screenshot({
-        path: `test-results/quiet-sailors-${width}.png`,
-        animations: "disabled",
-      });
+    const stage = (await scene.boundingBox())!;
+    const faces = await scene.locator(".sailor-face").all();
+    const bounds = await Promise.all(faces.map((face) => face.boundingBox()));
+    for (const box of bounds) {
+      expect(box!.x).toBeGreaterThanOrEqual(stage.x);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(stage.x + stage.width);
+      expect(box!.y).toBeGreaterThanOrEqual(stage.y);
+      expect(box!.y + box!.height).toBeLessThanOrEqual(stage.y + stage.height);
+    }
+    expect(bounds[0]!.x + bounds[0]!.width).toBeGreaterThan(bounds[1]!.x);
+    await expect(scene.locator(".sailor-crop").first()).toHaveCSS(
+      "overflow",
+      "visible",
+    );
+    await expect(scene.locator(".scene-backdrop")).toHaveCSS("filter", "none");
+    await page.locator(".hero").screenshot({
+      path: `test-results/quiet-sailors-${width}.png`,
+      animations: "disabled",
+    });
   }
   await page.addStyleTag({
     content:
@@ -330,4 +335,83 @@ test("sailor close-ups are passive, blink without body motion, and stay availabl
       }),
   ).toBe(true);
   await expect(scene.locator(".sailor-closeup")).toHaveCount(2);
+});
+
+test("a solo sailor stays fully inside the banner without visible captions", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const fixture = demoData();
+  fixture.travelers = [
+    { ...fixture.travelers[0], name: "Jesse", characterId: "finn" },
+  ];
+  fixture.entries = fixture.entries.filter(
+    (entry) => entry.travelerId === fixture.travelers[0].id,
+  );
+  await restore(page, fixture);
+  const scene = page.locator(".sailing-scene");
+  await expect(scene.locator("figcaption")).toHaveCount(0);
+  await expect(scene.locator("figure")).toHaveAccessibleName(/Jesse/);
+  for (const width of [1440, 768, 640, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    const stage = (await scene.boundingBox())!;
+    const face = (await scene.locator(".sailor-face").boundingBox())!;
+    expect(face.y).toBeGreaterThanOrEqual(stage.y + 11);
+    expect(face.y + face.height).toBeLessThanOrEqual(
+      stage.y + stage.height - 11,
+    );
+    expect(face.x).toBeGreaterThanOrEqual(stage.x);
+    expect(face.x + face.width).toBeLessThanOrEqual(stage.x + stage.width);
+    await page.locator(".hero").screenshot({
+      path: `test-results/solo-sailor-${width}.png`,
+      animations: "disabled",
+    });
+  }
+});
+
+test("live reactions update as water and alcohol leave the six-hour window without another save", async ({
+  page,
+}) => {
+  const reference = new Date("2026-11-15T02:00:00Z");
+  await page.clock.install({ time: reference });
+  await page.clock.pauseAt(new Date(reference.getTime() + 1000));
+  await page.goto("/");
+  const fixture = demoData();
+  const sailor = fixture.travelers[0];
+  const base = fixture.entries.find((entry) => entry.category === "Cocktail")!;
+  fixture.entries = Array.from({ length: 6 }, (_, index) => ({
+    ...base,
+    id: `rolling-${index}`,
+    travelerId: sailor.id,
+    sailingId: sailor.sailingId,
+    sailingDate: fixture.sailings[0].start,
+    time: new Date(reference.getTime() - 6 * 3600000 + 60000).toISOString(),
+  }));
+  fixture.entries.push({
+    ...fixture.entries[0],
+    id: "water",
+    category: "Water",
+    name: "Water",
+    time: new Date(reference.getTime() - 6 * 3600000 + 30000).toISOString(),
+  });
+  await restore(page, fixture);
+  const portrait = page
+    .getByRole("button", { name: "Show Alex's character", exact: true })
+    .locator(".character-portrait");
+  const banner = page.locator(
+    '.sailor-closeup[data-selected="true"] .character-portrait',
+  );
+  await expect(portrait).toHaveAttribute("data-mood", "merry");
+  await expect(page.getByLabel("Character day", { exact: true })).toHaveCount(
+    0,
+  );
+  await page.clock.fastForward(30000);
+  await expect(portrait).toHaveAttribute("data-mood", "water");
+  await expect(banner).toHaveAttribute("data-mood", "water");
+  await page.clock.fastForward(30000);
+  await expect(portrait).toHaveAttribute("data-mood", "ready");
+  await expect(banner).toHaveAttribute("data-mood", "ready");
+  await expect(
+    page.getByRole("button", { name: "Show Alex's character", exact: true }),
+  ).toContainText("0 logged · 0 alcohol");
 });

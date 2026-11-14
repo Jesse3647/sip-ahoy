@@ -36,7 +36,7 @@ export function ShipArtworkCredit() {
       target="_blank"
       rel="noreferrer"
     >
-      Ship photography & renderings © Royal Caribbean
+      Ship photography & renderings © Royal Caribbean International
     </a>
   );
 }

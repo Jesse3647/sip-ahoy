@@ -167,3 +167,48 @@ test("handle supports taps and keyboard, reflows on rotation, and respects reduc
   await expect(menu).toHaveCount(0);
   await touch.detach();
 });
+
+test("installation guide has a real draggable handle with scrolling and dismissal", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open menu" }).click();
+  await page
+    .getByRole("button", { name: "Install SipAhoy", exact: true })
+    .click();
+  const guide = page.getByRole("dialog", { name: "Install SipAhoy" });
+  const handle = guide.getByRole("button", {
+    name: "Expand installation guide",
+  });
+  await expect(handle).toBeVisible();
+  await expect(guide).toHaveAttribute("data-sheet", "compact");
+  await handle.tap();
+  await expect(guide).toHaveAttribute("data-sheet", "expanded");
+  await expect(
+    guide.getByRole("button", { name: "Collapse installation guide" }),
+  ).toBeVisible();
+  const touch = await page.context().newCDPSession(page);
+  await pull(page, touch, 30);
+  await expect(guide).toBeVisible();
+  await expect(guide).not.toHaveAttribute("data-closing", "true");
+  await page.setViewportSize({ width: 667, height: 375 });
+  await expect(guide).toHaveAttribute("data-sheet", "compact");
+  await touch.send("Input.synthesizeScrollGesture", {
+    x: 200,
+    y: 210,
+    yDistance: -100,
+    gestureSourceType: "touch",
+    speed: 400,
+  });
+  await expect
+    .poll(() => guide.locator(".sheet-content").evaluate((el) => el.scrollTop))
+    .toBeGreaterThan(20);
+  await expect(guide.locator(".sheet-handle")).toBeInViewport();
+  await page.screenshot({
+    path: "test-results/install-sheet-landscape.png",
+    animations: "disabled",
+  });
+  await pull(page, touch, (await guide.boundingBox())!.height / 3 + 10);
+  await expect(guide).toHaveCount(0);
+  await touch.detach();
+});

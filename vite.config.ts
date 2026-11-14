@@ -8,11 +8,17 @@ export default defineConfig({
       // Offer updates explicitly so a new app shell does not interrupt an open drink form.
       registerType: "prompt",
       includeAssets: [
+        "LICENSE.txt",
+        "THIRD_PARTY_NOTICES.txt",
         "icon.svg",
         "icon-192.png",
         "icon-512.png",
         "apple-touch-icon.png",
         "apple-touch-icon-v2.png",
+        "apple-touch-icon-120.png",
+        "apple-touch-icon-152.png",
+        "apple-touch-icon-167.png",
+        "apple-touch-icon-180.png",
         "icon-maskable-512.png",
         "icon-maskable-1024.png",
       ],

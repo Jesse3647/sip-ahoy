@@ -14,6 +14,7 @@ type ModalShellProps = {
   id?: string;
   /** Enables a real draggable handle on phone-sized navigation sheets. */
   mobileSheet?: boolean;
+  sheetLabel?: string;
 };
 
 /** Uses the native modal dialog for focus handling and reports Escape/backdrop dismissal to its owner. */
@@ -24,6 +25,7 @@ export function ModalShell({
   className,
   id,
   mobileSheet = false,
+  sheetLabel = "navigation menu",
 }: ModalShellProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const sheet = useMobileSheet(ref, onClose);
@@ -76,9 +78,7 @@ export function ModalShell({
             type="button"
             className="sheet-handle"
             aria-label={
-              sheet.expanded
-                ? "Collapse navigation menu"
-                : "Expand navigation menu"
+              sheet.expanded ? `Collapse ${sheetLabel}` : `Expand ${sheetLabel}`
             }
             aria-expanded={sheet.expanded}
             title="Drag up to expand; pull down one-third of the menu to close"

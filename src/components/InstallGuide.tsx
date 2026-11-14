@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Check, Download, Smartphone } from "lucide-react";
 import { type useInstallApp } from "../useInstallApp";
 import { isIOS } from "../useInstallApp";
-import { IOSShareAction, IOSShareFeedback } from "./IOSShareAction";
 
 type Platform = "ios" | "android" | "desktop" | "safari";
 function currentPlatform(): Platform {
@@ -110,8 +109,6 @@ export function InstallGuide({
           {status === "prompting" ? "Waiting for your browser…" : "Install now"}
         </button>
       )}
-      {platform === "ios" && <IOSShareAction installation={installation} />}
-      {platform === "ios" && <IOSShareFeedback installation={installation} />}
       {status === "accepted" && (
         <p className="install-feedback" role="status">
           Installation requested. Open SipAhoy from your home screen or app

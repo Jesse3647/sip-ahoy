@@ -33,6 +33,20 @@ test("new drinks and repeats celebrate after saving; edits do not", async ({
     "19",
   );
   await expect(page.locator(".celebration-card")).toHaveCSS("opacity", "1");
+  await page.locator(".celebration-card").evaluate((el) => {
+    el.getAnimations({ subtree: true }).forEach((animation) =>
+      animation.finish(),
+    );
+  });
+  const portrait = (await page
+    .locator(".celebration-card > .character-portrait")
+    .boundingBox())!;
+  const card = (await page.locator(".celebration-card").boundingBox())!;
+  expect(portrait.height).toBeCloseTo(portrait.width, 0);
+  expect(portrait.height).toBeGreaterThanOrEqual(80);
+  expect(
+    Math.abs(portrait.y + portrait.height / 2 - card.y - card.height / 2),
+  ).toBeLessThan(2);
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),
   ).toBeLessThanOrEqual(390);

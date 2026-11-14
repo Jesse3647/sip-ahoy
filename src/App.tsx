@@ -56,7 +56,6 @@ import { dateLabel, localDate } from "./formatting";
 import { DrinkDescription } from "./components/DrinkDescription";
 import { useInstallApp } from "./useInstallApp";
 import { InstallGuide } from "./components/InstallGuide";
-import { IOSShareAction, IOSShareFeedback } from "./components/IOSShareAction";
 import { usePreventPullToRefresh } from "./usePreventPullToRefresh";
 import { Brand } from "./components/Brand";
 import { Skipper } from "./components/Skipper";
@@ -67,11 +66,12 @@ import {
   characterIds,
   moods,
   sailorReaction,
+  reactionWindowMs,
   type CharacterId,
   type CharacterMood,
 } from "./characters";
 import { CharacterPortrait } from "./components/CharacterPortrait";
-import { CrewReactions, ReactionDay } from "./components/CrewReactions";
+import { CrewReactions } from "./components/CrewReactions";
 /** Available journal views; navigation state is local to this browser session. */
 type Page =
   | "Overview"
@@ -123,14 +123,24 @@ export default function App() {
     () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
   const [selectedSailorId, setSelectedSailorId] = useState<string | null>(null);
-  const [selectedReactionDay, setSelectedReactionDay] = useState<string | null>(
-    null,
-  );
-  const [today, setToday] = useState(() => localDate());
+  const [reactionNow, setReactionNow] = useState(Date.now);
+  useLayoutEffect(() => setReactionNow(Date.now()), [snapshot.data.entries]);
+  const today = localDate(new Date(reactionNow));
   useEffect(() => {
-    const timer = window.setInterval(() => setToday(localDate()), 60_000);
-    return () => window.clearInterval(timer);
-  }, []);
+    const update = () => setReactionNow(Date.now());
+    const nextExpiry = snapshot.data.entries.reduce((delay, entry) => {
+      const remaining = Date.parse(entry.time) + reactionWindowMs - Date.now();
+      return remaining > 0 ? Math.min(delay, remaining) : delay;
+    }, 60_000);
+    const timer = window.setTimeout(update, Math.max(1, nextExpiry));
+    window.addEventListener("focus", update);
+    document.addEventListener("visibilitychange", update);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("focus", update);
+      document.removeEventListener("visibilitychange", update);
+    };
+  }, [reactionNow, snapshot.data.entries]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [online, setOnline] = useState(navigator.onLine);
@@ -186,7 +196,6 @@ export default function App() {
   }, [page, snapshot.data.activeSailingId]);
   useEffect(() => {
     setSelectedSailorId(null);
-    setSelectedReactionDay(null);
   }, [snapshot.data.activeSailingId]);
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -276,17 +285,6 @@ export default function App() {
         .toLocaleLowerCase()
         .includes(search.trim().toLocaleLowerCase()),
   );
-  const reactionDay = sailing
-    ? selectedReactionDay &&
-      selectedReactionDay >= sailing.start &&
-      selectedReactionDay <= sailing.end
-      ? selectedReactionDay
-      : today < sailing.start
-        ? sailing.start
-        : today > sailing.end
-          ? sailing.end
-          : today
-    : today;
   const selectedSailor = crew.find((t) => t.id === selectedSailorId) ?? crew[0];
   const catalogMatches = filterDrinks(drinks, search, filter);
   const discoveredIds = new Set(entries.map((e) => e.drinkId));
@@ -366,10 +364,9 @@ export default function App() {
             const reaction = sailorReaction(
               traveler,
               [...entries, e],
-              e.sailingDate,
+              Date.now(),
             );
             setSelectedSailorId(traveler.id);
-            setSelectedReactionDay(e.sailingDate);
             setCelebration({
               id: uid(),
               name: e.name,
@@ -432,7 +429,7 @@ export default function App() {
               aria-label="Add SipAhoy to your Home Screen"
             >
               <img
-                src={`${import.meta.env.BASE_URL}apple-touch-icon-v2.png`}
+                src={`${import.meta.env.BASE_URL}apple-touch-icon-180.png`}
                 width="48"
                 height="48"
                 alt=""
@@ -444,7 +441,6 @@ export default function App() {
                   to add it.
                 </p>
                 <div className="ios-install-actions">
-                  <IOSShareAction installation={installation} />
                   <button
                     className="button primary"
                     onClick={() => {
@@ -461,7 +457,6 @@ export default function App() {
                     Not now
                   </button>
                 </div>
-                <IOSShareFeedback installation={installation} />
               </div>
             </aside>
           )}
@@ -587,7 +582,7 @@ export default function App() {
                               <CharacterPortrait
                                 characterId={characterFor(t)}
                                 mood={
-                                  sailorReaction(t, entries, reactionDay).mood
+                                  sailorReaction(t, entries, reactionNow).mood
                                 }
                                 decorative
                               />
@@ -605,7 +600,7 @@ export default function App() {
                       key={sailing.id}
                       crew={crew}
                       entries={entries}
-                      day={reactionDay}
+                      now={reactionNow}
                       selectedId={selectedSailor?.id}
                     />
                   </section>
@@ -641,9 +636,7 @@ export default function App() {
                   <CrewReactions
                     crew={crew}
                     entries={entries}
-                    sailing={sailing}
-                    day={reactionDay}
-                    onDay={setSelectedReactionDay}
+                    now={reactionNow}
                     selectedId={selectedSailor?.id}
                     onSelect={setSelectedSailorId}
                     onEdit={() =>
@@ -1069,13 +1062,8 @@ export default function App() {
                     </button>
                   </div>
                   <div className="crew-day-control">
-                    <ReactionDay
-                      sailing={sailing}
-                      day={reactionDay}
-                      onChange={setSelectedReactionDay}
-                    />
                     <p className="footnote">
-                      Playful daily reactions, not an intoxication estimate.
+                      Live six-hour reactions, not an intoxication estimate.
                     </p>
                   </div>
                   <div className="crew-grid">
@@ -1091,12 +1079,12 @@ export default function App() {
                         >
                           <CharacterPortrait
                             characterId={characterFor(t)}
-                            mood={sailorReaction(t, entries, reactionDay).mood}
+                            mood={sailorReaction(t, entries, reactionNow).mood}
                           />
                           <span className="crew-mood-label">
                             {
                               moods[
-                                sailorReaction(t, entries, reactionDay).mood
+                                sailorReaction(t, entries, reactionNow).mood
                               ].label
                             }
                           </span>
@@ -1138,15 +1126,22 @@ export default function App() {
             </>
           )}
           <footer>
-            <span>
-              <Anchor size={14} /> SipAhoy
-            </span>
-            <span>
-              Data is saved on this device.{" "}
-              <button onClick={() => setModal({ type: "backup" })}>
-                Export a backup <ArrowRight size={12} />
-              </button>
-            </span>
+            <div className="footer-credits">
+              <a
+                href={`${import.meta.env.BASE_URL}LICENSE.txt`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open source · MIT License
+              </a>
+              <a
+                href={`${import.meta.env.BASE_URL}THIRD_PARTY_NOTICES.txt`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Ship photography & renderings © Royal Caribbean International
+              </a>
+            </div>
           </footer>
         </div>
       </main>
@@ -1255,6 +1250,8 @@ export default function App() {
       )}
       {modal && (
         <ModalShell
+          mobileSheet={modal.type === "install"}
+          sheetLabel="installation guide"
           title={
             modal.type === "sailing"
               ? modal.sailing

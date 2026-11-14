@@ -1,0 +1,123 @@
+SipAhoy — Third-party notices
+
+The MIT License applies to SipAhoy's original software and associated documentation.
+Third-party images, source material, trademarks, and dependencies retain their
+respective rights and are not relicensed under SipAhoy's MIT License.
+
+SHIP PHOTOGRAPHY AND RENDERINGS
+
+Copyright © Royal Caribbean International. All rights reserved.
+The official ship photography and promotional renderings in public/ships remain
+the property of their respective rights holders. Their inclusion here does not
+grant redistribution or reuse rights under the MIT License.
+
+Source: https://www.royalcaribbean.com/cruise-ships
+Retrieved: November 14, 2026
+
+Individual ship artwork sources:
+
+Hero of the Seas — ships/hero.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/hero-of-the-seas-aft
+
+Legend of the Seas — ships/legend.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/legend-of-the-seas-daytime-aft-view-vertical-render-700-530-2-2
+
+Star of the Seas — ships/star.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/star-of-the-seas-sailing-900-900
+
+Icon of the Seas — ships/icon.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/icon-of-the-seas-aerial-angle-aft-day-1
+
+Allure of the Seas — ships/allure.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/allure-of-the-seas-ship-sailing-900-900
+
+Harmony of the Seas — ships/harmony.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/harmony-of-the-seas-bow-angle-900-900
+
+Symphony of the Seas — ships/symphony.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/symphony-of-the-seas-ship-top-view-aerial
+
+Oasis of the Seas — ships/oasis.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/oasis-of-the-seas-aft-900-900
+
+Utopia of the Seas — ships/utopia.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/utopia-of-the-sea-aft-ocean-horizon-1920-800
+
+Wonder of the Seas — ships/wonder.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/wonder-of-the-seas-cruise-ship-aerial-aft-700-530-2-1
+
+Adventure of the Seas — ships/adventure.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/adventure-exterior-horizon-day-island-ship-900-900
+
+Anthem of the Seas — ships/anthem.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/Anthem%20of%20the%20Seas
+
+Brilliance of the Seas — ships/brilliance.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/brilliance-of-the-seas-hero-900-900
+
+Enchantment of the Seas — ships/enchantment.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/enchantment-exterior-side-aerial-day-sailing-ship-900-900
+
+Explorer of the Seas — ships/explorer.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/explorer-exterior-side-aerial-day-sailing-ship-900-900
+
+Freedom of the Seas — ships/freedom.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/freedom-exterior-side-aerial-day-sailing-ship-900-900
+
+Grandeur of the Seas — ships/grandeur.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/grandeur-of-the-seas-sailing-900-900
+
+Independence of the Seas — ships/independence.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/independence-cruise-ship-europe-may2018-revite-amped-up-hero-shot-900-900
+
+Jewel of the Seas — ships/jewel.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/jewel-of-the-seas-grenada-docked-harbor-900-900
+
+Liberty of the Seas — ships/liberty.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/liberty-of-the-seas-ship-carousel-mobile-700-530.?fmt=png-alpha
+
+Mariner of the Seas — ships/mariner.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/mariner-side-of-the-ship-tile-900-900
+
+Navigator of the Seas — ships/navigator.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/navigator-of-the-seas-aft-aerial-slides-hero-1
+
+Odyssey of the Seas — ships/odyssey.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/odyssey-side-view-ship-sunset-tile-900-900
+
+Ovation of the Seas — ships/ovation.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/ovation-of-the-seas-northstar-aerial-1
+
+Quantum of the Seas — ships/quantum.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/quantum-of-the-seas-dusk-900-900
+
+Radiance of the Seas — ships/radiance.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/radiance-exterior-side-aerial-day-port-glaciers-ship
+
+Serenade of the Seas — ships/serenade.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/serenade-of-the-seas-ship-carousel-mobile-700-530_-900-900
+
+Spectrum of the Seas — ships/spectrum.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/spectrum-of-the-seas-aerial-skypad-hero-900-900
+
+Vision of the Seas — ships/vision.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/vision-exterior-front-aerial-day-port-ship-900-900
+
+Voyager of the Seas — ships/voyager.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/voyager-of-the-seas-ship-carousel-900-900
+
+Rhapsody of the Seas — ships/rhapsody.webp
+https://assets.dm.rccl.com/is/image/RoyalCaribbeanCruises/rhapsody-of-the-seas-alaska-sailing-hero
+
+OTHER ARTWORK AND SOURCE MATERIAL
+
+The illustrated pool-deck scene and sailor characters are original generated
+artwork for SipAhoy; they are not official Royal Caribbean ship imagery.
+Royal Caribbean names and trademarks belong to their respective owners.
+SipAhoy is an independent project, not affiliated with or endorsed by Royal Caribbean.
+
+Community catalog source links are preserved in the app and in
+src/data/community-catalog.json. Attribution does not transfer ownership or
+imply an open license for third-party source material.
+
+Third-party software dependencies retain their individual licenses.
