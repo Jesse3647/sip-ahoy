@@ -40,12 +40,10 @@ test("hamburger navigation, contextual logging, and dialog scroll restoration", 
         await page.evaluate(() => document.documentElement.scrollWidth),
       ).toBeLessThanOrEqual(size.width);
       await page.getByRole("button", { name: "Open menu" }).click();
-      const active = page
-        .getByRole("navigation")
-        .getByRole("button", {
-          name: name === "Overview" ? "Home" : name,
-          exact: true,
-        });
+      const active = page.getByRole("navigation").getByRole("button", {
+        name: name === "Overview" ? "Home" : name,
+        exact: true,
+      });
       await expect(active).toHaveAttribute("aria-current", "page");
       const bounds = await active.boundingBox();
       expect(bounds!.width).toBeGreaterThanOrEqual(44);
@@ -146,7 +144,7 @@ test("reduced motion removes decorative animations and onboarding fits a small p
     .click();
   expect(
     await page
-      .locator(".skipper > .character-portrait")
+      .locator('.sailor-closeup[data-selected="true"] .character-portrait')
       .evaluate((el) => getComputedStyle(el).animationName),
   ).toBe("none");
   expect(

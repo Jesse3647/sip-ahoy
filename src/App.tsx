@@ -58,6 +58,7 @@ import { useInstallApp } from "./useInstallApp";
 import { InstallGuide } from "./components/InstallGuide";
 import { Brand } from "./components/Brand";
 import { Skipper } from "./components/Skipper";
+import { SailingScene } from "./components/SailingScene";
 import { SaveCelebration } from "./components/SaveCelebration";
 import {
   characterFor,
@@ -284,9 +285,6 @@ export default function App() {
           : today
     : today;
   const selectedSailor = crew.find((t) => t.id === selectedSailorId) ?? crew[0];
-  const selectedReaction = selectedSailor
-    ? sailorReaction(selectedSailor, entries, reactionDay)
-    : null;
   const catalogMatches = filterDrinks(drinks, search, filter);
   const discoveredIds = new Set(entries.map((e) => e.drinkId));
   /** Renders the shared search/category controls used by the menu and passport views. */
@@ -524,7 +522,7 @@ export default function App() {
               )}
               {page === "Overview" && (
                 <>
-                  <section className="hero">
+                  <section className="hero hero-with-scene">
                     <div className="hero-copy">
                       <span className="pill">
                         <span /> YOUR SAILING
@@ -559,19 +557,15 @@ export default function App() {
                           {crew.length === 1 ? "traveler" : "travelers"} ·{" "}
                           {days(sailing)} calendar days
                         </span>
-                        <button onClick={() => setPage("Sailing & crew")}>
-                          View sailing <ArrowRight size={15} />
-                        </button>
                       </div>
                     </div>
-                    <div className="hero-art">
-                      <Skipper
-                        key={`${selectedSailor?.id}-${reactionDay}`}
-                        characterId={characterFor(selectedSailor)}
-                        mood={selectedReaction?.mood ?? "ready"}
-                        travelerName={selectedSailor?.name}
-                      />
-                    </div>
+                    <SailingScene
+                      key={sailing.id}
+                      crew={crew}
+                      entries={entries}
+                      day={reactionDay}
+                      selectedId={selectedSailor?.id}
+                    />
                   </section>
                   <section
                     className="stat-grid"

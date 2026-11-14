@@ -10,9 +10,9 @@ test("new drinks and repeats celebrate after saving; edits do not", async ({
   await page
     .getByRole("button", { name: "Take a look with sample data" })
     .click();
-  await expect(page.locator(".skipper > .character-portrait")).toBeVisible();
-  await page.getByRole("button", { name: "Say ahoy to Skipper" }).click();
-  await expect(page.getByText("Ahoy, friend!", { exact: true })).toBeVisible();
+  await expect(
+    page.locator('.sailor-closeup[data-selected="true"] .character-portrait'),
+  ).toBeVisible();
   await openLog(page);
   await expect(
     page.getByRole("button", { name: "Save drink", exact: true }),
@@ -68,7 +68,7 @@ test("new drinks and repeats celebrate after saving; edits do not", async ({
   );
   expect(
     await page
-      .locator(".skipper > .character-portrait")
+      .locator('.sailor-closeup[data-selected="true"] .character-portrait')
       .evaluate(async (el) => {
         const image = new Image();
         image.src = getComputedStyle(el).backgroundImage.slice(5, -2);

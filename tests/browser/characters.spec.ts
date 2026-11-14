@@ -48,20 +48,18 @@ test("each sailor keeps an independent character through reload, backup restore,
   await page
     .getByRole("button", { name: "Save traveler", exact: true })
     .click();
-  await expect(page.locator(".hero-art .character-portrait")).toHaveAttribute(
-    "data-character",
-    "pearl",
-  );
+  await expect(
+    page.locator('.sailor-closeup[data-selected="true"] .character-portrait'),
+  ).toHaveAttribute("data-character", "pearl");
   await expect(
     page
       .getByRole("button", { name: "Show Sam's character", exact: true })
       .locator(".character-portrait"),
   ).toHaveAttribute("data-character", "pip");
   await page.reload();
-  await expect(page.locator(".hero-art .character-portrait")).toHaveAttribute(
-    "data-character",
-    "pearl",
-  );
+  await expect(
+    page.locator('.sailor-closeup[data-selected="true"] .character-portrait'),
+  ).toHaveAttribute("data-character", "pearl");
   await openBackups(page);
   const downloadEvent = page.waitForEvent("download");
   await page
@@ -85,17 +83,15 @@ test("each sailor keeps an independent character through reload, backup restore,
     .getByRole("button", { name: "Save traveler", exact: true })
     .click();
   await restore(page, exported.data);
-  await expect(page.locator(".hero-art .character-portrait")).toHaveAttribute(
-    "data-character",
-    "pearl",
-  );
+  await expect(
+    page.locator('.sailor-closeup[data-selected="true"] .character-portrait'),
+  ).toHaveAttribute("data-character", "pearl");
   await page
     .getByRole("button", { name: "Show Sam's character", exact: true })
     .click();
-  await expect(page.locator(".hero-art .character-portrait")).toHaveAttribute(
-    "data-character",
-    "pip",
-  );
+  await expect(
+    page.locator('.sailor-closeup[data-selected="true"] .character-portrait'),
+  ).toHaveAttribute("data-character", "pip");
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;
   });
@@ -187,10 +183,9 @@ test("daily reactions update per sailor after saves and removals without leaking
     "data-mood",
     "water",
   );
-  await expect(page.locator(".hero-art .character-portrait")).toHaveAttribute(
-    "data-mood",
-    "water",
-  );
+  await expect(
+    page.locator('.sailor-closeup[data-selected="true"] .character-portrait'),
+  ).toHaveAttribute("data-mood", "water");
   await page.getByRole("button", { name: "Dismiss celebration" }).click();
   await page.locator(".crew-reactions").screenshot({
     path: "test-results/sailor-daily-reactions.png",
@@ -219,4 +214,120 @@ test("daily reactions update per sailor after saves and removals without leaking
     "data-mood",
     "ready",
   );
+});
+
+test("sailor close-ups are passive, blink without body motion, and stay available offline", async ({
+  page,
+  context,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/");
+  const fixture = demoData();
+  const base = fixture.travelers[0];
+  const day = fixture.sailings[0].start;
+  fixture.travelers = [
+    "Alex",
+    "Sam",
+    "Jesse",
+    "Morgan",
+    "A sailor with a very long name",
+    "Pearl",
+  ].map((name, index) => ({
+    ...base,
+    id: `portrait-${index}`,
+    name,
+    characterId: (
+      ["skipper", "pip", "finn", "sunny", "clawdia", "pearl"] as const
+    )[index],
+  }));
+  const cocktail = fixture.entries.find(
+    (entry) => entry.category === "Cocktail",
+  )!;
+  fixture.entries = fixture.travelers.flatMap((sailor, index) =>
+    Array.from({ length: [0, 1, 3, 5, 0, 1][index] }, (_, n) => ({
+      ...cocktail,
+      id: `${sailor.id}-${n}`,
+      travelerId: sailor.id,
+      sailingId: sailor.sailingId,
+      sailingDate: day,
+    })),
+  );
+  await restore(page, fixture);
+  await page.getByLabel("Character day", { exact: true }).fill(day);
+  const scene = page.locator(".sailing-scene");
+  await scene.scrollIntoViewIfNeeded();
+  await expect(
+    page.locator(".hero button, .hero a, .hero [tabindex]"),
+  ).toHaveCount(0);
+  await expect(scene.locator(".sailor-closeup")).toHaveCount(2);
+  await expect(scene.locator(".sailor-blink").first()).toHaveCSS(
+    "animation-name",
+    "sailor-eyelids",
+  );
+  await expect(scene.locator(".character-portrait").first()).toHaveCSS(
+    "animation-name",
+    "none",
+  );
+  const selected = page.locator('.sailor-closeup[data-selected="true"]');
+  for (const [index, name] of fixture.travelers.map((t) => t.name).entries()) {
+    await page
+      .getByRole("button", { name: `Show ${name}'s character`, exact: true })
+      .click();
+    await expect(selected.locator(".character-portrait")).toHaveAttribute(
+      "data-character",
+      fixture.travelers[index].characterId!,
+    );
+    await expect(selected.locator(".character-portrait")).toHaveAttribute(
+      "data-mood",
+      ["ready", "cheerful", "merry", "water", "ready", "cheerful"][index],
+    );
+  }
+  await page
+    .getByRole("button", { name: "Show Alex's character", exact: true })
+    .click();
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(width);
+    await page
+      .locator(".hero")
+      .screenshot({
+        path: `test-results/quiet-sailors-${width}.png`,
+        animations: "disabled",
+      });
+  }
+  await page.addStyleTag({
+    content:
+      ".sailor-blink { animation: none !important; opacity: 1 !important; }",
+  });
+  await scene.screenshot({ path: "test-results/quiet-sailors-blink.png" });
+  await page.reload();
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  expect(
+    await scene
+      .locator("*")
+      .evaluateAll((els) =>
+        els.every((el) => getComputedStyle(el).animationName === "none"),
+      ),
+  ).toBe(true);
+  await expect(scene.locator(".sailor-blink").first()).toHaveCSS(
+    "opacity",
+    "0",
+  );
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.ready;
+  });
+  await context.setOffline(true);
+  await page.reload();
+  expect(
+    await scene
+      .locator(".scene-backdrop")
+      .evaluate(async (image: HTMLImageElement) => {
+        await image.decode();
+        return image.naturalWidth > 0;
+      }),
+  ).toBe(true);
+  await expect(scene.locator(".sailor-closeup")).toHaveCount(2);
 });

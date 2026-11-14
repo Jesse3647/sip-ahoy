@@ -28,7 +28,7 @@ export default defineConfig({
       },
       // Bundled menus ship inside the JavaScript cache; runtime source-site requests are unnecessary.
       workbox: {
-        globPatterns: ["**/*.{js,css,html,svg,png,webp,woff2}"],
+        globPatterns: ["**/*.{js,css,html,svg,png,jpg,webp,woff2}"],
         navigateFallback: "index.html",
       },
     }),

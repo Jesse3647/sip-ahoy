@@ -287,3 +287,18 @@ Native integration should sit behind capability adapters when introduced; the UI
 - Validation: production build, both gesture scenarios, and both existing mobile scenarios passed. Checked surrounding taps, fast pulls just below the threshold, cancellation, compact/expanded dismissal, animated exit, native content scrolling, focus/scroll restoration, and reduced motion in browser emulation.
 
 The sailing picker now uses ship artwork cards with full trip dates and a clear current selection. All 31 supported ships have locally cached official photography or renderings, also shown in sailing setup and Sailing & crew. See [ship artwork sources and maintenance](docs/ship-artwork.md).
+
+### 2026-11-14 — Animated shipboard sailing banner
+
+- Replaced the single oversized hero mascot with a miniature Royal Caribbean inspired pool deck and Schooner Bar. Original locally bundled artwork includes the colorful Lime & Coconut style pool bar, striped loungers, ocean railings, and a nautical piano lounge with rigging and brass portholes. See [scene artwork and behavior](docs/shipboard-scenes.md).
+- Up to four assigned sailors share the foreground, with additional crew accessible through “More sailors.” Each sailor independently strolls, bounces, dances, or takes a quiet water break using the existing selected-day reaction calculation. Tapping a sailor selects them and reveals a temporary mood-specific quip.
+- Added ambient details and small interactive surprises. A lingering visit changes venues after 90 visible seconds; choosing a venue keeps that choice for the visit. Offscreen/background animations pause, and system reduced motion suppresses animations and automatic scene changes.
+- Both scene backgrounds are precached for offline cruising. No saved data, package calculations, or reaction thresholds changed.
+- Validation: production build, unused-symbol TypeScript checks, all 39 unit tests, and nine targeted browser scenarios passed (including the focused scene rerun after correcting an animation assertion). Reviewed desktop and 320/390px screenshots; verified individual moods, larger crews, taps, scene switching, reduced motion, and both backgrounds after an offline reload. Real-device iPhone verification remains outstanding.
+
+### 2026-11-14 — Quiet close-up revision
+
+- Simplified the sailing banner to a passive, tightly framed portrait of the selected sailor and one crewmate, with a softened and cropped poolside background. Removed all banner controls, venue switching, greetings, roaming, dancing, ambient effects, and tap interactions.
+- Added brief staggered eyelid-only blinks, aligned for all six characters and all four expressions. The existing selected-day drink reactions still determine the static facial artwork; bodies and backgrounds remain still. Reduced motion disables blinking; background tabs and offscreen portraits pause it.
+- Kept larger crews available through the existing sailor selector below the banner. Removed the unused Schooner Bar art from the shipped assets while retaining its source locally.
+- Validation: production build, unused-symbol checks, and all eight targeted character/celebration/mobile browser scenarios passed. Reviewed desktop and 320/390px layouts plus closed-eyelid artwork for all 24 character/mood combinations. Confirmed the banner has no focusable controls and works after an offline reload.
