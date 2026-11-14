@@ -83,6 +83,13 @@ This README is the project ledger. Update the milestone checkboxes and progress 
 
 ## Progress log
 
+### 2026-11-14 — Install icon selection, quiet handle focus, and native sharing
+
+- Marked every manifest icon candidate as maskable, added a full-bleed 1024px candidate following Apple's Safari guidance, increased maskable foreground size, and versioned the Apple touch icon URL. This addresses browser padding/fallback and cached-icon selection; actual Home Screen rendering still needs iPhone verification.
+- Removed the yellow outline specifically from the menu grip. Keyboard focus still changes the grip to cobalt; other controls retain their focus outlines.
+- Added Open Share to the iOS invitation and installation guide when native sharing is available. The button opens the system share sheet with the app URL. The guide remains available if sharing fails or Add to Home Screen is absent. Cancellation is quiet, and successful sharing never marks the app installed. iOS still has no direct install prompt API; native-share actions are selected by the browser/OS.
+- Validation: root and `/sip-ahoy/` production builds, 39 unit tests, and 14 targeted installation/menu browser scenarios passed. Checks cover native-share success/cancellation/errors and unsupported browsers, no false installed state, every icon's opaque corner pixels/masking metadata, and the grip's keyboard focus and touch gestures. Visually reviewed the banner at 320px. Native iOS share actions and final Home Screen icon rendering still require physical-device verification.
+
 ### 2026-11-14 — iOS installation and pull-to-refresh fixes
 
 - Rebuilt installation icons with opaque cobalt corners, added a dedicated 180px Apple touch icon, and separated the maskable icon with safe artwork padding. iOS now applies its own corner mask without white showing through. Existing installed icons may stay cached; export a JSON backup before removing/re-adding an installed app.

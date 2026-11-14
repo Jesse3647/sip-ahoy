@@ -4142,6 +4142,10 @@ a:focus-visible {
 .sheet-handle {
   display: none;
 }
+.sheet-handle:focus,
+.sheet-handle:focus-visible {
+  outline: none;
+}
 @media (max-width: 700px) {
   .navigation-menu[data-sheet] {
     display: flex;

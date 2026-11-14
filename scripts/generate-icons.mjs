@@ -10,10 +10,12 @@ const browser = await chromium.launch({ channel: "chrome", headless: true });
 try {
   const page = await browser.newPage();
   for (const [name, size, maskable] of [
-    ["icon-192.png", 192, false],
-    ["icon-512.png", 512, false],
+    ["icon-192.png", 192, true],
+    ["icon-512.png", 512, true],
     ["apple-touch-icon.png", 180, false],
+    ["apple-touch-icon-v2.png", 180, false],
     ["icon-maskable-512.png", 512, true],
+    ["icon-maskable-1024.png", 1024, true],
   ]) {
     const data = await page.evaluate(
       async ({ source, size, maskable }) => {
@@ -26,7 +28,7 @@ try {
         image.src = `data:image/svg+xml,${encodeURIComponent(source)}`;
         await image.decode();
         // Keep all foreground artwork inside the maskable icon's central safe circle.
-        const scale = maskable ? 0.75 : 1;
+        const scale = maskable ? 0.9 : 1;
         const inset = (size * (1 - scale)) / 2;
         ctx.drawImage(image, inset, inset, size * scale, size * scale);
         return canvas.toDataURL("image/png").split(",")[1];

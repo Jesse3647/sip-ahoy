@@ -12,7 +12,9 @@ export default defineConfig({
         "icon-192.png",
         "icon-512.png",
         "apple-touch-icon.png",
+        "apple-touch-icon-v2.png",
         "icon-maskable-512.png",
+        "icon-maskable-1024.png",
       ],
       manifest: {
         name: "SipAhoy — Your cruise drink journal",
@@ -23,12 +25,25 @@ export default defineConfig({
         display: "standalone",
         start_url: ".",
         icons: [
-          { src: "icon-192.png", sizes: "192x192", type: "image/png" },
+          // Every candidate is opaque and full-bleed, so Safari need not inset an
+          // `any`-only image onto a white tile when choosing an installation icon.
+          {
+            src: "icon-192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any maskable",
+          },
           {
             src: "icon-512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "any",
+            purpose: "any maskable",
+          },
+          {
+            src: "icon-maskable-1024.png",
+            sizes: "1024x1024",
+            type: "image/png",
+            purpose: "any maskable",
           },
           {
             src: "icon-maskable-512.png",

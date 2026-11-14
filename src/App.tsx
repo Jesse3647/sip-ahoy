@@ -56,6 +56,7 @@ import { dateLabel, localDate } from "./formatting";
 import { DrinkDescription } from "./components/DrinkDescription";
 import { useInstallApp } from "./useInstallApp";
 import { InstallGuide } from "./components/InstallGuide";
+import { IOSShareAction, IOSShareFeedback } from "./components/IOSShareAction";
 import { usePreventPullToRefresh } from "./usePreventPullToRefresh";
 import { Brand } from "./components/Brand";
 import { Skipper } from "./components/Skipper";
@@ -431,7 +432,7 @@ export default function App() {
               aria-label="Add SipAhoy to your Home Screen"
             >
               <img
-                src={`${import.meta.env.BASE_URL}apple-touch-icon.png`}
+                src={`${import.meta.env.BASE_URL}apple-touch-icon-v2.png`}
                 width="48"
                 height="48"
                 alt=""
@@ -443,6 +444,7 @@ export default function App() {
                   to add it.
                 </p>
                 <div className="ios-install-actions">
+                  <IOSShareAction installation={installation} />
                   <button
                     className="button primary"
                     onClick={() => {
@@ -459,6 +461,7 @@ export default function App() {
                     Not now
                   </button>
                 </div>
+                <IOSShareFeedback installation={installation} />
               </div>
             </aside>
           )}

@@ -130,6 +130,11 @@ test("handle supports taps and keyboard, reflows on rotation, and respects reduc
   await expect(menu).toHaveAttribute("data-sheet", "expanded");
   await expect(menu).toHaveCSS("transition-duration", "0s");
   await handle.press("ArrowDown");
+  await expect(handle).toHaveCSS("outline-style", "none");
+  await expect(handle.locator("span")).toHaveCSS(
+    "background-color",
+    "rgb(53, 79, 255)",
+  );
   await expect(menu).toHaveAttribute("data-sheet", "compact");
   await handle.press("ArrowUp");
   await expect(menu).toHaveAttribute("data-sheet", "expanded");
