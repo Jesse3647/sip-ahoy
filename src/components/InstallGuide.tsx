@@ -88,7 +88,12 @@ export function InstallGuide({
   return (
     <div className="install-guide">
       <div className="install-intro">
-        <img src="/icon-192.png" alt="" width="64" height="64" />
+        <img
+          src={`${import.meta.env.BASE_URL}icon-192.png`}
+          alt=""
+          width="64"
+          height="64"
+        />
         <div>
           <h3>Your journal, one tap away</h3>
           <p>

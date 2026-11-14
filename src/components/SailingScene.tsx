@@ -47,7 +47,11 @@ export function SailingScene({
       data-active={active}
       aria-label="Your sailors by the pool"
     >
-      <img className="scene-backdrop" src="/scenes/pool-deck.jpg" alt="" />
+      <img
+        className="scene-backdrop"
+        src={`${import.meta.env.BASE_URL}scenes/pool-deck.jpg`}
+        alt=""
+      />
       <div className="portrait-crew" data-count={visibleCrew.length}>
         {visibleCrew.map((sailor, index) => {
           const { mood } = sailorReaction(sailor, entries, day);

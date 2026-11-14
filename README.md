@@ -2,6 +2,24 @@
 
 An offline-first cruise drink journal built with React and TypeScript. Track drinks quickly, travel with different groups across sailings, compare the value of optional drink packages, and collect a personal drink passport.
 
+## GitHub Pages deployment
+
+[`.github/workflows/pages.yml`](.github/workflows/pages.yml) follows the hexagon-display deployment pattern: pull requests install locked dependencies, run unit tests, and build/type-check the app. Pushes to `main` and manual runs on `main` also publish `dist` through the official GitHub Pages actions.
+
+In the repository's **Settings → Pages → Build and deployment**, select **GitHub Actions** as the source. After this workflow is pushed to `main`, the site will be available at <https://jesse3647.github.io/sipahoy/>. Later pushes to `main` deploy automatically; a manual run is also available under **Actions → Deploy GitHub Pages → Run workflow**. No personal access token or custom secret is required.
+
+The workflow builds with `npm run build -- --base=/sipahoy/` (using the repository name dynamically). Artwork uses Vite's base URL so it loads correctly beneath the repository path, and the PWA service worker stays scoped to that path. Local development continues to use `/`.
+
+To preview the Pages build locally:
+
+```sh
+npm ci
+npm run build -- --base=/sipahoy/
+npm run preview -- --base=/sipahoy/
+```
+
+Open the preview server's `/sipahoy/` URL. Journal data stays in the browser; publishing does not transfer local preview data to the hosted site. Use a JSON backup and restore to move a journal between origins.
+
 ## Project direction
 
 - The web app is a complete product: no account, backend, or paid Apple Developer Program required for the MVP.
@@ -59,11 +77,17 @@ This README is the project ledger. Update the milestone checkboxes and progress 
 
 ### Milestone 4 — Distribution and optional connected features · ideas
 
-- Choose static hosting and a stable HTTPS origin for the PWA.
+- Use GitHub Pages for the PWA's stable HTTPS origin; deployment automation is configured, with the first hosted deployment pending.
 - Evaluate native distribution separately from PWA distribution.
 - Consider opt-in backend sync/shared catalogs only if file backups and nearby sharing prove insufficient. Local-only usage must remain available.
 
 ## Progress log
+
+### 2026-11-14 — GitHub Pages deployment automation
+
+- Added a GitHub Actions workflow following hexagon-display: locked npm installation, unit tests, production build/type checks, Pages artifact upload, and a separate deployment job with limited publishing permissions. Pull requests validate without publishing; pushes and manual runs on `main` deploy.
+- Made character, ship, scene, and install-guide artwork respect the deployment base path. The workflow builds for `/sipahoy/`; local development retains `/`.
+- Validation: production Pages build and all 39 unit tests passed. A Chrome preview at `/sipahoy/` verified 10 displayed artwork resources, scoped installation metadata/service worker, zero page/request errors, and a successful offline reload with artwork intact. The workflow has not yet run on GitHub.
 
 ### 2026-11-14 — Initial build
 

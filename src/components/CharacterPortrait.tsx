@@ -27,7 +27,7 @@ export function CharacterPortrait({
         decorative ? undefined : `${character.name} · ${moods[mood].label}`
       }
       style={{
-        backgroundImage: `url(/characters/${characterId}.png)`,
+        backgroundImage: `url(${import.meta.env.BASE_URL}characters/${characterId}.png)`,
         backgroundPosition: moods[mood].position,
       }}
     >

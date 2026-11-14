@@ -12,7 +12,7 @@ export function ShipArtwork({
 }) {
   const art = (artwork as Record<string, { file: string }>)[ship];
   const [failedSource, setFailedSource] = useState("");
-  const src = art ? `/ships/${art.file}` : "";
+  const src = art ? `${import.meta.env.BASE_URL}ships/${art.file}` : "";
   return (
     <span className={`ship-artwork ${className}`}>
       {src && failedSource !== src ? (
