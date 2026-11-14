@@ -6,19 +6,19 @@ An offline-first cruise drink journal built with React and TypeScript. Track dri
 
 [`.github/workflows/pages.yml`](.github/workflows/pages.yml) follows the hexagon-display deployment pattern: pull requests install locked dependencies, run unit tests, and build/type-check the app. Pushes to `main` and manual runs on `main` also publish `dist` through the official GitHub Pages actions.
 
-In the repository's **Settings → Pages → Build and deployment**, select **GitHub Actions** as the source. After this workflow is pushed to `main`, the site will be available at <https://jesse3647.github.io/sipahoy/>. Later pushes to `main` deploy automatically; a manual run is also available under **Actions → Deploy GitHub Pages → Run workflow**. No personal access token or custom secret is required.
+In the repository's **Settings → Pages → Build and deployment**, select **GitHub Actions** as the source. After this workflow is pushed to `main`, the site will be available at <https://jesse3647.github.io/sip-ahoy/>. Later pushes to `main` deploy automatically; a manual run is also available under **Actions → Deploy GitHub Pages → Run workflow**. No personal access token or custom secret is required.
 
-The workflow builds with `npm run build -- --base=/sipahoy/` (using the repository name dynamically). Artwork uses Vite's base URL so it loads correctly beneath the repository path, and the PWA service worker stays scoped to that path. Local development continues to use `/`.
+The workflow builds with `npm run build -- --base=/sip-ahoy/` (using the repository name dynamically). Artwork uses Vite's base URL so it loads correctly beneath the repository path, and the PWA service worker stays scoped to that path. Local development continues to use `/`.
 
 To preview the Pages build locally:
 
 ```sh
 npm ci
-npm run build -- --base=/sipahoy/
-npm run preview -- --base=/sipahoy/
+npm run build -- --base=/sip-ahoy/
+npm run preview -- --base=/sip-ahoy/
 ```
 
-Open the preview server's `/sipahoy/` URL. Journal data stays in the browser; publishing does not transfer local preview data to the hosted site. Use a JSON backup and restore to move a journal between origins.
+Open the preview server's `/sip-ahoy/` URL. Journal data stays in the browser; publishing does not transfer local preview data to the hosted site. Use a JSON backup and restore to move a journal between origins.
 
 ## Project direction
 
@@ -86,7 +86,7 @@ This README is the project ledger. Update the milestone checkboxes and progress 
 ### 2026-11-14 — GitHub Pages deployment automation
 
 - Added a GitHub Actions workflow following hexagon-display: locked npm installation, unit tests, production build/type checks, Pages artifact upload, and a separate deployment job with limited publishing permissions. Pull requests validate without publishing; pushes and manual runs on `main` deploy.
-- Made character, ship, scene, and install-guide artwork respect the deployment base path. The workflow builds for `/sipahoy/`; local development retains `/`.
+- Made character, ship, scene, and install-guide artwork respect the deployment base path. The workflow derives its base path from the repository name (`/sip-ahoy/` after the repository rename); local development retains `/`.
 - Validation: production Pages build and all 39 unit tests passed. A Chrome preview at `/sipahoy/` verified 10 displayed artwork resources, scoped installation metadata/service worker, zero page/request errors, and a successful offline reload with artwork intact. The workflow has not yet run on GitHub.
 
 ### 2026-11-14 — Initial build
