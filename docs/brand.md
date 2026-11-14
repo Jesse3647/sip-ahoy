@@ -7,6 +7,10 @@ The revised identity uses electric cobalt (`#3156f5`), fizzy aqua (`#38cfcc`), t
 - [Skipper mascot](../public/brand/skipper.png): original transparent octopus captain, generated with the built-in image-generation tool, then resized to a 640px maximum edge for the app. No third-party asset requests are needed at runtime.
 - [Logo source](../public/icon.svg): code-native vector mark combining a drink glass, aqua wave, sunset, and straw. Used by the shared wordmark and browser favicon.
 - [192px app icon](../public/icon-192.png) and [512px app icon](../public/icon-512.png): rasterized from the vector source for installation and home-screen use.
+- [Apple touch icon](../public/apple-touch-icon.png): dedicated 180px icon with an opaque cobalt background covering the entire square. iOS applies the corner mask; rounding or transparency must not be baked into installation icons.
+- [Maskable icon](../public/icon-maskable-512.png): separate 512px artwork with the foreground reduced to fit the central safe area. The manifest uses distinct `any` and `maskable` entries.
+
+Regenerate installation icons with `node scripts/generate-icons.mjs` after changing the SVG. This uses the project's Playwright dependency and local Chrome; the rounded favicon remains unchanged. The generator fills the full canvas before drawing the mark. If iOS retains an old installed icon, export a JSON journal backup before removing/re-adding the Home Screen app, because removal can discard that app's local data.
 
 ## Character and behavior
 

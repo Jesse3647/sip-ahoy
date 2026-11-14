@@ -1,5 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 
+export const isIOS = () =>
+  /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+  (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+
+const iosOfferKey = "sipahoy-ios-install-dismissed";
+function offerIOSInstall() {
+  if (!isIOS()) return false;
+  try {
+    return localStorage.getItem(iosOfferKey) !== "true";
+  } catch {
+    return true;
+  }
+}
+
 type InstallPrompt = Event & {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
@@ -19,6 +33,15 @@ const inAppWindow = () =>
 /** Captures a one-use browser install prompt; never treats an ordinary tab as proof of installation. */
 export function useInstallApp() {
   const [installed, setInstalled] = useState(inAppWindow);
+  const [iosOffer, setIOSOffer] = useState(offerIOSInstall);
+  const dismissIOSOffer = () => {
+    setIOSOffer(false);
+    try {
+      localStorage.setItem(iosOfferKey, "true");
+    } catch {
+      /* Keep this session usable when storage is unavailable. */
+    }
+  };
   const [promptEvent, setPromptEvent] = useState<InstallPrompt | null>(null);
   const [status, setStatus] = useState<
     "idle" | "prompting" | "accepted" | "dismissed" | "error"
@@ -66,5 +89,12 @@ export function useInstallApp() {
       installing.current = false;
     }
   };
-  return { installed, canPrompt: !!promptEvent, status, install };
+  return {
+    installed,
+    canPrompt: !!promptEvent,
+    status,
+    install,
+    showIOSOffer: iosOffer && !installed,
+    dismissIOSOffer,
+  };
 }

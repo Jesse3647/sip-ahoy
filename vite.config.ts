@@ -7,7 +7,13 @@ export default defineConfig({
     VitePWA({
       // Offer updates explicitly so a new app shell does not interrupt an open drink form.
       registerType: "prompt",
-      includeAssets: ["icon.svg", "icon-192.png", "icon-512.png"],
+      includeAssets: [
+        "icon.svg",
+        "icon-192.png",
+        "icon-512.png",
+        "apple-touch-icon.png",
+        "icon-maskable-512.png",
+      ],
       manifest: {
         name: "SipAhoy — Your cruise drink journal",
         short_name: "SipAhoy",
@@ -22,7 +28,13 @@ export default defineConfig({
             src: "icon-512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "any maskable",
+            purpose: "any",
+          },
+          {
+            src: "icon-maskable-512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
           },
         ],
       },

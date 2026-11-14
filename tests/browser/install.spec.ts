@@ -127,3 +127,129 @@ for (const mode of ["ios", "standalone"]) {
     ).toHaveCount(0);
   });
 }
+
+async function simulateIOS(page: Page) {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "userAgent", {
+      value:
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1",
+    });
+  });
+}
+
+test("iOS offers home-screen guidance, remembers dismissal, and keeps manual installation available", async ({
+  page,
+}) => {
+  await simulateIOS(page);
+  await page.setViewportSize({ width: 320, height: 740 });
+  await page.goto("/");
+  const offer = page.getByRole("complementary", {
+    name: "Add SipAhoy to your Home Screen",
+  });
+  await expect(offer).toBeVisible();
+  expect(await offer.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(
+    true,
+  );
+  await offer.getByRole("button", { name: "Show me how" }).click();
+  const guide = page.getByRole("dialog", { name: "Install SipAhoy" });
+  await expect(guide).toContainText("Share menu");
+  await expect(guide.getByRole("button", { name: "Install now" })).toHaveCount(
+    0,
+  );
+  await expect(page.getByLabel("Installation instructions for")).toHaveValue(
+    "ios",
+  );
+  await page.getByRole("button", { name: "Close dialog" }).click();
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Open menu" })).toBeVisible();
+  await expect(offer).toHaveCount(0);
+  await openInstall(page);
+  await expect(guide).toContainText("Add to Home Screen");
+  await page.getByRole("button", { name: "Close dialog" }).click();
+  await page.evaluate(() =>
+    localStorage.removeItem("sipahoy-ios-install-dismissed"),
+  );
+  await page.reload();
+  await offer.getByRole("button", { name: "Not now" }).click();
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Open menu" })).toBeVisible();
+  await expect(offer).toHaveCount(0);
+});
+
+test("iOS home-screen windows never show the installation offer", async ({
+  page,
+}) => {
+  await simulateIOS(page);
+  await page.addInitScript(() =>
+    Object.defineProperty(navigator, "standalone", { value: true }),
+  );
+  await page.goto("/");
+  await expect(page.getByRole("button", { name: "Open menu" })).toBeVisible();
+  await expect(
+    page.getByRole("complementary", {
+      name: "Add SipAhoy to your Home Screen",
+    }),
+  ).toHaveCount(0);
+});
+
+test("iOS touch guard blocks top-edge pulls while preserving inner scrolling and pinch zoom", async ({
+  page,
+}) => {
+  await simulateIOS(page);
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open menu" }).click();
+  const result = await page
+    .getByRole("dialog", { name: "All aboard" })
+    .evaluate((dialog) => {
+      const scroller = document.createElement("div");
+      scroller.style.cssText =
+        "height:100px;overflow-y:auto;overscroll-behavior-y:contain";
+      scroller.innerHTML = '<div style="height:500px">Scroll content</div>';
+      dialog.append(scroller);
+      const target = scroller.firstElementChild!;
+      const pull = (dx: number, dy: number, fingers = 1) => {
+        const touches = (x: number, y: number) =>
+          Array.from(
+            { length: fingers },
+            (_, identifier) =>
+              new Touch({
+                identifier,
+                target,
+                clientX: x + identifier * 20,
+                clientY: y,
+              }),
+          );
+        target.dispatchEvent(
+          new TouchEvent("touchstart", {
+            bubbles: true,
+            touches: touches(100, 100),
+          }),
+        );
+        const move = new TouchEvent("touchmove", {
+          bubbles: true,
+          cancelable: true,
+          touches: touches(100 + dx, 100 + dy),
+        });
+        target.dispatchEvent(move);
+        target.dispatchEvent(
+          new TouchEvent("touchend", { bubbles: true, touches: [] }),
+        );
+        return move.defaultPrevented;
+      };
+      const top = pull(0, 40);
+      const upward = pull(0, -40);
+      const sideways = pull(40, 5);
+      const pinch = pull(0, 40, 2);
+      scroller.scrollTop = 100;
+      const scrolling = pull(0, 40);
+      scroller.remove();
+      return { top, upward, sideways, pinch, scrolling };
+    });
+  expect(result).toEqual({
+    top: true,
+    upward: false,
+    sideways: false,
+    pinch: false,
+    scrolling: false,
+  });
+});

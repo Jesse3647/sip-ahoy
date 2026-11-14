@@ -1,15 +1,12 @@
 import { useState } from "react";
 import { Check, Download, Smartphone } from "lucide-react";
 import { type useInstallApp } from "../useInstallApp";
+import { isIOS } from "../useInstallApp";
 
 type Platform = "ios" | "android" | "desktop" | "safari";
 function currentPlatform(): Platform {
   const ua = navigator.userAgent;
-  if (
-    /iPhone|iPad|iPod/i.test(ua) ||
-    (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1)
-  )
-    return "ios";
+  if (isIOS()) return "ios";
   if (/Android/i.test(ua)) return "android";
   if (
     /Macintosh/i.test(ua) &&

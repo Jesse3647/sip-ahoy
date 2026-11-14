@@ -83,6 +83,13 @@ This README is the project ledger. Update the milestone checkboxes and progress 
 
 ## Progress log
 
+### 2026-11-14 — iOS installation and pull-to-refresh fixes
+
+- Rebuilt installation icons with opaque cobalt corners, added a dedicated 180px Apple touch icon, and separated the maskable icon with safe artwork padding. iOS now applies its own corner mask without white showing through. Existing installed icons may stay cached; export a JSON backup before removing/re-adding an installed app.
+- Disabled vertical overscroll and added an iOS single-touch boundary guard because Safari can ignore the CSS-only setting. Downward pulls at the top are cancelled while ordinary document/dialog scrolling, sideways gestures, pinch zoom, and the menu's pointer-driven handle remain available. Explicit app updates are still available.
+- Added a dismissible iPhone/iPad Home Screen invitation linking to the existing installation guide. Dismissal is remembered; the menu retains manual access. Installed app windows hide the invitation. iOS installation still requires the user's Share → Add to Home Screen action; a site cannot launch a native iOS installation prompt.
+- Validation: both root and `/sip-ahoy/` production builds and all 39 unit tests passed. Eleven installation/menu/mobile browser scenarios passed, including simulated iOS offer dismissal, installed-state hiding, boundary touch cancellation, preserved scrolling, and pinch gestures. All four raster icons have verified opaque cobalt corner pixels, and the 390px banner was visually reviewed. Physical iPhone/Safari pull-to-refresh and OS installation remain to be verified.
+
 ### 2026-11-14 — GitHub Pages deployment automation
 
 - Added a GitHub Actions workflow following hexagon-display: locked npm installation, unit tests, production build/type checks, Pages artifact upload, and a separate deployment job with limited publishing permissions. Pull requests validate without publishing; pushes and manual runs on `main` deploy.

@@ -56,6 +56,7 @@ import { dateLabel, localDate } from "./formatting";
 import { DrinkDescription } from "./components/DrinkDescription";
 import { useInstallApp } from "./useInstallApp";
 import { InstallGuide } from "./components/InstallGuide";
+import { usePreventPullToRefresh } from "./usePreventPullToRefresh";
 import { Brand } from "./components/Brand";
 import { Skipper } from "./components/Skipper";
 import { SailingScene } from "./components/SailingScene";
@@ -95,6 +96,7 @@ const icons: Record<Page, typeof Anchor> = {
 };
 /** Coordinates journal loading/saving, sailing-scoped views, navigation, and editor lifecycles. */
 export default function App() {
+  usePreventPullToRefresh();
   const installation = useInstallApp();
   const [snapshot, setSnapshot] = useState<Snapshot>({
     revision: 0,
@@ -423,6 +425,43 @@ export default function App() {
           </div>
         </header>
         <div className="content">
+          {installation.showIOSOffer && (
+            <aside
+              className="ios-install-offer"
+              aria-label="Add SipAhoy to your Home Screen"
+            >
+              <img
+                src={`${import.meta.env.BASE_URL}apple-touch-icon.png`}
+                width="48"
+                height="48"
+                alt=""
+              />
+              <div>
+                <h2>Add SipAhoy to your Home Screen?</h2>
+                <p>
+                  Keep your cruise journal one tap away. Use Safari’s Share menu
+                  to add it.
+                </p>
+                <div className="ios-install-actions">
+                  <button
+                    className="button primary"
+                    onClick={() => {
+                      installation.dismissIOSOffer();
+                      setModal({ type: "install" });
+                    }}
+                  >
+                    Show me how
+                  </button>
+                  <button
+                    className="button"
+                    onClick={installation.dismissIOSOffer}
+                  >
+                    Not now
+                  </button>
+                </div>
+              </div>
+            </aside>
+          )}
           {error && (
             <div className="banner error" role="alert">
               {error} <button onClick={() => location.reload()}>Reload</button>

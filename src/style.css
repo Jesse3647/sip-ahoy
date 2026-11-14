@@ -20,8 +20,38 @@
 * {
   box-sizing: border-box;
 }
+html,
+body {
+  overscroll-behavior-y: none;
+}
 body {
   margin: 0;
+}
+.ios-install-offer {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fff;
+}
+.ios-install-offer img {
+  border-radius: 11px;
+}
+.ios-install-offer h2 {
+  font-size: 18px;
+}
+.ios-install-offer p {
+  margin-top: 6px;
+  color: var(--muted);
+}
+.ios-install-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
 }
 button,
 input,
