@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Check, Clock3, Plus, Search } from "lucide-react";
+import { Check, Clock3, Plus } from "lucide-react";
 import { categories, money, type Drink, type Entry } from "./model";
 import { drinkPrice, filterDrinks, recentDrinks } from "./catalog";
+import { SearchField } from "./components/SearchField";
 import { DrinkDescription } from "./components/DrinkDescription";
 /** Inputs for DrinkPicker. */
 type DrinkPickerProps = {
@@ -111,20 +112,18 @@ export function DrinkPicker({
           Select a drink from your recents or search the menu.
         </p>
       )}
-      <div className="search picker-search">
-        <Search size={17} />
-        <input
-          type="search"
-          aria-label="Search drinks"
-          placeholder="Search drinks, brands, or bars…"
-          value={query}
-          onFocus={() => setBrowsing(true)}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setLimit(30);
-            setBrowsing(true);
-          }}
-        />
+      <SearchField
+        className="picker-search"
+        label="Search drinks"
+        placeholder="Search drinks, brands, or bars…"
+        value={query}
+        onFocus={() => setBrowsing(true)}
+        onChange={(value) => {
+          setQuery(value);
+          setLimit(30);
+          setBrowsing(true);
+        }}
+      >
         <button
           type="button"
           className="plain"
@@ -133,7 +132,7 @@ export function DrinkPicker({
         >
           {browsing ? "Close" : "Browse"}
         </button>
-      </div>
+      </SearchField>
       {browsing && (
         <div className="drink-browser">
           <div className="picker-filters">

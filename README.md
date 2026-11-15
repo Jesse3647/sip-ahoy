@@ -95,6 +95,14 @@ This README is the project ledger. Update the milestone checkboxes and progress 
 
 ## Progress log
 
+### 2026-11-14 — Session-only scenes, clearable search, and compact footer
+
+- Removed persistence of background choices/timers. Fresh launches select randomly; creating or switching sailings immediately selects a different scene. Section changes and focus/foreground resume use an in-memory hourly timer. The previous local-storage scene record cannot pin the background anymore.
+- Added a shared search control with an explicit X clear button to the log, ship menu, passport, and drink picker. Clearing restores the results, keeps the active category/sailor filters, returns focus to the input, and never submits a drink form. Removed the blue focus outline from search inputs and suppressed the browser's duplicate clear icon.
+- Reduced footer link spacing and let credits wrap as ordinary text rather than tall flex boxes. Verified no overflow and a compact gap at 320, 390, 402 and 1280px; reviewed the 402px footer.
+- Validation: 52 unit tests and all 15 targeted browser scenarios passed, covering fresh/new-sailing scene selection, ignored legacy preferences, hourly checks, offline scenes, search clearing/focus/filter preservation, and existing journal/package/backup flows. The footer was visually checked at phone and desktop widths.
+
+
 ### 2026-11-14 — Random scenes after an hour since the last change
 
 - Scene selection is now random, including the first visit. Navigation between screens/sailings, relaunch, or foreground resume chooses a different scene once an hour has elapsed since the last actual change. Quick navigation/reopening preserves the timestamp rather than postponing rotation indefinitely. The current scene remains still until a navigation/open/resume check.

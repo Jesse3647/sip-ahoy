@@ -36,11 +36,12 @@ describe("random scenes on eligible navigation/open checks", () => {
       expect(choices.size).toBe(5);
     }
   });
-  it("migrates the old opening timestamp and safely handles bad data or a backwards clock", () => {
-    expect(nextOpeningScene({ index: 3, lastOpened: 1000 }, 1500)).toEqual({
-      index: 3,
-      lastChanged: 1000,
-    });
+  it("new sailings choose a different scene immediately", () => {
+    expect(
+      nextOpeningScene({ index: 3, lastChanged: 1000 }, 1500, () => 0, true),
+    ).toEqual({ index: 4, lastChanged: 1500 });
+  });
+  it("safely handles bad data or a backwards clock", () => {
     expect(nextOpeningScene({ index: 3, lastChanged: 1000 }, 500)).toEqual({
       index: 3,
       lastChanged: 500,

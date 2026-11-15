@@ -65,23 +65,21 @@ test("without a sailing only setup actions are available", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("navigation and relaunch choose a different random scene after an hour without resetting the timer early", async ({
+test("scene choices are not persisted: new sailings change immediately, pages change after an hour, and relaunch picks fresh", async ({
   page,
 }) => {
   const initial = new Date("2026-11-14T12:00:00Z");
   await page.clock.install({ time: initial });
+  await page.addInitScript(() => {
+    Math.random = () =>
+      Number(sessionStorage.getItem("test-scene-draw") ?? "0");
+  });
   await page.goto("/");
   await page
     .getByRole("button", { name: "Take a look with sample data" })
     .click();
   const scene = page.locator(".sailing-scene");
-  await expect(scene).toBeVisible();
-  const first = await scene.getAttribute("data-scene");
-  const firstChanged = await page.evaluate(
-    () =>
-      JSON.parse(localStorage.getItem("sipahoy-opening-scene")!)
-        .lastChanged as number,
-  );
+  await expect(scene).toHaveAttribute("data-scene", "pool-deck");
   const navigate = async (name: string) => {
     await page.getByRole("button", { name: "Open menu", exact: true }).click();
     await page
@@ -89,39 +87,46 @@ test("navigation and relaunch choose a different random scene after an hour with
       .getByRole("button", { name, exact: true })
       .click();
   };
-  await page.clock.setSystemTime(new Date(initial.getTime() + hour - 1000));
-  await page.reload();
-  await expect(scene).toHaveAttribute("data-scene", first!);
-  expect(
-    await page.evaluate(
-      () =>
-        JSON.parse(localStorage.getItem("sipahoy-opening-scene")!).lastChanged,
-    ),
-  ).toBe(firstChanged);
-  await page.clock.setSystemTime(new Date(initial.getTime() + hour + 10000));
-  await expect(scene).toHaveAttribute("data-scene", first!);
+  await navigate("New sailing");
+  await page.getByLabel("Sailing name", { exact: true }).fill("Another cruise");
+  await page
+    .getByRole("combobox", { name: "Ship", exact: true })
+    .selectOption("Wonder of the Seas");
+  await page.getByLabel("First day").fill("2027-02-01");
+  await page.getByLabel("Last day").fill("2027-02-08");
+  await page
+    .getByRole("button", { name: "Create sailing", exact: true })
+    .click();
+  await expect(scene).not.toHaveAttribute("data-scene", "pool-deck");
+  const second = await scene.getAttribute("data-scene");
   await navigate("Drink log");
   await navigate("Home");
-  await expect(scene).not.toHaveAttribute("data-scene", first!);
-  const second = await scene.getAttribute("data-scene");
-  await page.reload();
   await expect(scene).toHaveAttribute("data-scene", second!);
-  await page.clock.setSystemTime(new Date(initial.getTime() + 3 * hour));
-  await page.reload();
+  await page.clock.setSystemTime(new Date(initial.getTime() + hour + 10000));
+  await navigate("Drink log");
+  await navigate("Home");
   await expect(scene).not.toHaveAttribute("data-scene", second!);
   const third = await scene.getAttribute("data-scene");
-  await page.clock.setSystemTime(new Date(initial.getTime() + 5 * hour));
-  await expect(scene).toHaveAttribute("data-scene", third!);
-  await page.evaluate(() =>
-    document.dispatchEvent(new Event("visibilitychange")),
+  const target = (sceneIds.indexOf(third!) + 1) % sceneIds.length;
+  await page.evaluate(
+    (value) => sessionStorage.setItem("test-scene-draw", String(value)),
+    (target + 0.5) / sceneIds.length,
   );
-  await expect(scene).not.toHaveAttribute("data-scene", third!);
+  await page.reload();
+  await expect(scene).toHaveAttribute("data-scene", sceneIds[target]);
+  expect(
+    await page.evaluate(() => localStorage.getItem("sipahoy-opening-scene")),
+  ).toBeNull();
 });
 
 test("all six backgrounds are readable offline and on phone layouts", async ({
   page,
   context,
 }) => {
+  await page.addInitScript(() => {
+    Math.random = () =>
+      Number(sessionStorage.getItem("test-scene-draw") ?? "0");
+  });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   await page
@@ -132,12 +137,8 @@ test("all six backgrounds are readable offline and on phone layouts", async ({
   await context.setOffline(true);
   for (let index = 0; index < sceneIds.length; index++) {
     await page.evaluate(
-      (index) =>
-        localStorage.setItem(
-          "sipahoy-opening-scene",
-          JSON.stringify({ index, lastChanged: Date.now() }),
-        ),
-      index,
+      (value) => sessionStorage.setItem("test-scene-draw", String(value)),
+      (index + 0.5) / sceneIds.length,
     );
     await page.reload();
     const scene = page.locator(".sailing-scene");
@@ -155,4 +156,24 @@ test("all six backgrounds are readable offline and on phone layouts", async ({
       animations: "disabled",
     });
   }
+});
+
+test("an old persisted background cannot pin the scene on a new launch", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "sipahoy-opening-scene",
+      JSON.stringify({ index: 5, lastChanged: Date.now() + 86400000 }),
+    );
+    Math.random = () => 0;
+  });
+  await page.goto("/");
+  await page
+    .getByRole("button", { name: "Take a look with sample data" })
+    .click();
+  await expect(page.locator(".sailing-scene")).toHaveAttribute(
+    "data-scene",
+    "pool-deck",
+  );
 });

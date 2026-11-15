@@ -17,7 +17,6 @@ import {
   Martini,
   Menu,
   Plus,
-  Search,
   Download,
   Ship,
   Trash2,
@@ -61,6 +60,7 @@ import { InstallGuide } from "./components/InstallGuide";
 import { usePreventPullToRefresh } from "./usePreventPullToRefresh";
 import { Brand } from "./components/Brand";
 import { useOpeningScene } from "./useOpeningScene";
+import { SearchField } from "./components/SearchField";
 import { Skipper } from "./components/Skipper";
 import { SailingScene } from "./components/SailingScene";
 import { SaveCelebration } from "./components/SaveCelebration";
@@ -111,9 +111,7 @@ export default function App() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [page, setPage] = useState<Page>("Overview");
-  const openingScene = useOpeningScene(
-    `${page}:${snapshot.data.activeSailingId ?? ""}`,
-  );
+  const openingScene = useOpeningScene(page, snapshot.data.activeSailingId);
   const [menuOpen, setMenuOpen] = useState(false);
   const [sailingPickerOpen, setSailingPickerOpen] = useState(false);
   const [modal, setModal] = useState<Modal>(null);
@@ -324,18 +322,15 @@ export default function App() {
   function renderCatalogControls(label: string) {
     return (
       <div className="toolbar catalog-toolbar">
-        <div className="search">
-          <Search size={17} />
-          <input
-            aria-label={label}
-            placeholder="Find a drink, brand, or bar…"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setMenuLimit(36);
-            }}
-          />
-        </div>
+        <SearchField
+          label={label}
+          placeholder="Find a drink, brand, or bar…"
+          value={search}
+          onChange={(value) => {
+            setSearch(value);
+            setMenuLimit(36);
+          }}
+        />
         <select
           aria-label="Catalog category"
           value={filter}
@@ -793,16 +788,12 @@ export default function App() {
               {page === "Drink log" && (
                 <section className="card">
                   <div className="toolbar log-toolbar">
-                    <div className="search">
-                      <Search size={17} aria-hidden="true" />
-                      <input
-                        type="search"
-                        aria-label="Search drink log"
-                        placeholder="Find a drink, venue, or note…"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                      />
-                    </div>
+                    <SearchField
+                      label="Search drink log"
+                      placeholder="Find a drink, venue, or note…"
+                      value={search}
+                      onChange={setSearch}
+                    />
                     <select
                       aria-label="Filter by sailor"
                       value={filter}

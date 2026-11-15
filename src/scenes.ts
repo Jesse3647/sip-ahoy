@@ -7,7 +7,6 @@ export const scenes = [
   { id: "moonlit-deck", label: "Moonlit deck" },
 ] as const;
 export type Scene = (typeof scenes)[number];
-export const sceneStorageKey = "sipahoy-opening-scene";
 export const sceneOpeningGap = 60 * 60 * 1000;
 export type SceneOpening = { index: number; lastChanged: number };
 
@@ -16,10 +15,10 @@ export function nextOpeningScene(
   value: unknown,
   now: number,
   random = Math.random,
+  force = false,
 ): SceneOpening {
-  const previous = value as
-    (Partial<SceneOpening> & { lastOpened?: number }) | null;
-  const timestamp = previous?.lastChanged ?? previous?.lastOpened;
+  const previous = value as Partial<SceneOpening> | null;
+  const timestamp = previous?.lastChanged;
   if (
     !previous ||
     !Number.isInteger(previous.index) ||
@@ -30,7 +29,7 @@ export function nextOpeningScene(
   ) {
     return { index: Math.floor(random() * scenes.length), lastChanged: now };
   }
-  if (now - timestamp! >= sceneOpeningGap) {
+  if (force || now - timestamp! >= sceneOpeningGap) {
     // Pick uniformly from every scene except the current one.
     const offset = 1 + Math.floor(random() * (scenes.length - 1));
     return {

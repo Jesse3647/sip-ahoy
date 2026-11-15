@@ -53,10 +53,6 @@ export function CrewReactions({
         })}
       </div>
       <div className="reaction-footer">
-        <p>
-          Live six-hour reactions. Water changes the animation score, not
-          alcohol levels. Not an intoxication estimate.
-        </p>
         <button className="plain" onClick={onEdit}>
           Change character
         </button>

@@ -1,48 +1,44 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import {
-  nextOpeningScene,
-  scenes,
-  sceneStorageKey,
-  type SceneOpening,
-} from "./scenes";
+import { nextOpeningScene, scenes, type SceneOpening } from "./scenes";
 
-/** Navigation, opening and resuming check the hour since the last actual change. */
-export function useOpeningScene(navigationKey: string) {
+/** Scenes are session-only: new sailings change immediately, navigation/resume
+ * changes after an hour, and a fresh launch starts a fresh random selection. */
+export function useOpeningScene(
+  navigationKey: string,
+  sailingId: string | null,
+) {
   const [index, setIndex] = useState(0);
-  const fallback = useRef<SceneOpening | null>(null);
+  const current = useRef<SceneOpening | null>(null);
+  const previousSailing = useRef<string | null | undefined>(undefined);
   useLayoutEffect(() => {
-    const opened = () => {
-      let previous: unknown = fallback.current;
-      try {
-        if (!previous)
-          previous = JSON.parse(
-            localStorage.getItem(sceneStorageKey) ?? "null",
-          );
-      } catch {
-        /* Use this visit's state if storage is unavailable. */
-      }
-      const next = nextOpeningScene(previous, Date.now());
-      fallback.current = next;
-      try {
-        localStorage.setItem(sceneStorageKey, JSON.stringify(next));
-      } catch {
-        /* Cosmetic preferences must not prevent opening the journal. */
-      }
+    const changedSailing =
+      previousSailing.current != null && previousSailing.current !== sailingId;
+    previousSailing.current = sailingId;
+    const check = (force = false) => {
+      const next = nextOpeningScene(
+        current.current,
+        Date.now(),
+        Math.random,
+        force,
+      );
+      current.current = next;
       setIndex(next.index);
     };
-    opened();
+    check(changedSailing);
     const visible = () => {
-      if (!document.hidden) opened();
+      if (!document.hidden) check();
     };
     const restored = (event: PageTransitionEvent) => {
       if (event.persisted) visible();
     };
     document.addEventListener("visibilitychange", visible);
+    window.addEventListener("focus", visible);
     window.addEventListener("pageshow", restored);
     return () => {
       document.removeEventListener("visibilitychange", visible);
+      window.removeEventListener("focus", visible);
       window.removeEventListener("pageshow", restored);
     };
-  }, [navigationKey]);
+  }, [navigationKey, sailingId]);
   return scenes[index];
 }

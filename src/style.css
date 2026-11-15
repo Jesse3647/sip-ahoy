@@ -810,12 +810,16 @@ footer {
   flex-basis: 100%;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 24px;
+  gap: 4px 24px;
+  align-items: baseline;
 }
 .footer-credits a {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
+  min-height: 0;
+  display: block;
+  max-width: 100%;
+  padding: 2px 0;
+  line-height: 1.5;
+  overflow-wrap: break-word;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -906,6 +910,24 @@ footer button {
   width: 100%;
   font-size: 14px;
   color: var(--teal);
+}
+.search input:focus,
+.search input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.search input::-webkit-search-cancel-button,
+.search input::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+.search-clear {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 8px;
+  color: var(--muted);
 }
 .toolbar select {
   flex: 0 1 220px;
