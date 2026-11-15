@@ -122,6 +122,9 @@ test("handle supports taps and keyboard, reflows on rotation, and respects reduc
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
+  await page
+    .getByRole("button", { name: "Take a look with sample data" })
+    .click();
   await page.getByRole("button", { name: "Open menu" }).click();
   const menu = page.getByRole("dialog", { name: "All aboard" });
   const handle = page.locator(".sheet-handle");

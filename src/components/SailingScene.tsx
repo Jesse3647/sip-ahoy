@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { characterFor, moods, sailorReaction } from "../characters";
+import type { Scene } from "../scenes";
 import type { Entry, Traveler } from "../model";
 import { CharacterPortrait } from "./CharacterPortrait";
 import { SailorBlink } from "./SailorBlink";
 
-/** A quiet close-up, with no controls or scene changes. Crew selection lives below the banner. */
+/** A quiet portrait on this opening's backdrop. Crew selection lives below the banner. */
 export function SailingScene({
+  scene,
   crew,
   entries,
   now,
   selectedId,
 }: {
+  scene: Scene;
   crew: Traveler[];
   entries: Entry[];
   now: number;
@@ -45,11 +48,12 @@ export function SailingScene({
       className="sailing-scene"
       ref={stage}
       data-active={active}
-      aria-label="Your sailors by the pool"
+      aria-label={`Your sailors · ${scene.label}`}
+      data-scene={scene.id}
     >
       <img
         className="scene-backdrop"
-        src={`${import.meta.env.BASE_URL}scenes/pool-deck.jpg`}
+        src={`${import.meta.env.BASE_URL}scenes/${scene.id}.jpg`}
         alt=""
       />
       <div className="portrait-crew" data-count={visibleCrew.length}>

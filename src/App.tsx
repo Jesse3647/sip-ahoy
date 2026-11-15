@@ -59,6 +59,7 @@ import { useInstallApp } from "./useInstallApp";
 import { InstallGuide } from "./components/InstallGuide";
 import { usePreventPullToRefresh } from "./usePreventPullToRefresh";
 import { Brand } from "./components/Brand";
+import { useOpeningScene } from "./useOpeningScene";
 import { Skipper } from "./components/Skipper";
 import { SailingScene } from "./components/SailingScene";
 import { SaveCelebration } from "./components/SaveCelebration";
@@ -99,6 +100,7 @@ const icons: Record<Page, typeof Anchor> = {
 /** Coordinates journal loading/saving, sailing-scoped views, navigation, and editor lifecycles. */
 export default function App() {
   usePreventPullToRefresh();
+  const openingScene = useOpeningScene();
   const installation = useInstallApp();
   const [snapshot, setSnapshot] = useState<Snapshot>({
     revision: 0,
@@ -221,6 +223,9 @@ export default function App() {
   const sailing =
     data.sailings.find((s) => s.id === data.activeSailingId) ??
     data.sailings[0];
+  useLayoutEffect(() => {
+    if (!sailing) setPage("Overview");
+  }, [sailing]);
   const crew = data.travelers.filter((t) => t.sailingId === sailing?.id);
   const entries = data.entries
     .filter((e) => e.sailingId === sailing?.id)
@@ -477,17 +482,19 @@ export default function App() {
           )}
           <div className="page-heading">
             <div>
-              <h1>{page}</h1>
+              <h1>{sailing ? page : "Welcome aboard"}</h1>
               <p>
-                {page === "Overview"
-                  ? "Drink totals and package comparisons for this sailing."
-                  : page === "Drink passport"
-                    ? "See which drinks you’ve tried."
-                    : page === "Drink log"
-                      ? "Review, repeat, or edit logged drinks."
-                      : page === "Menus & prices"
-                        ? "Search community menus and update your prices."
-                        : "Manage sailings, travelers, and drink packages."}
+                {!sailing
+                  ? "Start a sailing to make this journal your own."
+                  : page === "Overview"
+                    ? "Drink totals and package comparisons for this sailing."
+                    : page === "Drink passport"
+                      ? "See which drinks you’ve tried."
+                      : page === "Drink log"
+                        ? "Review, repeat, or edit logged drinks."
+                        : page === "Menus & prices"
+                          ? "Search community menus and update your prices."
+                          : "Manage sailings, travelers, and drink packages."}
               </p>
             </div>
             {sailing && (page === "Overview" || page === "Drink log") && (
@@ -509,7 +516,7 @@ export default function App() {
           {!sailing ? (
             <section className="empty-onboard">
               <div className="nautical">
-                <Skipper />
+                <Skipper cycleCharacters />
               </div>
               <h2>Create a sailing</h2>
               <p>
@@ -622,6 +629,7 @@ export default function App() {
                       </div>
                     </div>
                     <SailingScene
+                      scene={openingScene}
                       key={sailing.id}
                       crew={crew}
                       entries={entries}
@@ -1195,83 +1203,99 @@ export default function App() {
           onClose={() => setMenuOpen(false)}
         >
           <nav aria-label="Main navigation">
-            <div className="menu-shortcuts">
-              <button
-                className="menu-home"
-                aria-current={page === "Overview" ? "page" : undefined}
-                onClick={() => {
-                  setMenuOpen(false);
-                  setPage("Overview");
-                }}
-              >
-                <LayoutDashboard size={24} />
-                <span>Home</span>
-              </button>
-              <button
-                className="menu-log"
-                disabled={
-                  !sailing ||
-                  busy ||
-                  !crew.length ||
-                  !drinks.length ||
-                  !venues.length ||
-                  fatal
-                }
-                onClick={() => {
-                  setMenuOpen(false);
-                  setModal({ type: "log" });
-                }}
-              >
-                <Plus size={24} />
-                <span>Log a drink</span>
-              </button>
-            </div>
-            <div className="menu-session-actions">
+            {sailing ? (
+              <>
+                <div className="menu-shortcuts">
+                  <button
+                    className="menu-home"
+                    aria-current={page === "Overview" ? "page" : undefined}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setPage("Overview");
+                    }}
+                  >
+                    <LayoutDashboard size={24} />
+                    <span>Home</span>
+                  </button>
+                  <button
+                    className="menu-log"
+                    disabled={
+                      !sailing ||
+                      busy ||
+                      !crew.length ||
+                      !drinks.length ||
+                      !venues.length ||
+                      fatal
+                    }
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setModal({ type: "log" });
+                    }}
+                  >
+                    <Plus size={24} />
+                    <span>Log a drink</span>
+                  </button>
+                </div>
+                <div className="menu-session-actions">
+                  <button
+                    className="menu-destination"
+                    disabled={busy || fatal}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setPage("Overview");
+                      setModal({ type: "sailing" });
+                    }}
+                  >
+                    <Plus size={21} />
+                    <span>New sailing</span>
+                  </button>
+                  <button
+                    className="menu-destination"
+                    disabled={!sailing || busy || fatal}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setPage("Overview");
+                      setSailingPickerOpen(true);
+                    }}
+                  >
+                    <Ship size={21} />
+                    <span>Your sailings</span>
+                  </button>
+                </div>
+                {(Object.keys(icons) as Page[])
+                  .filter((p) => p !== "Overview")
+                  .map((p) => {
+                    const Icon = icons[p];
+                    return (
+                      <button
+                        key={p}
+                        className="menu-destination"
+                        aria-current={page === p ? "page" : undefined}
+                        onClick={() => {
+                          setMenuOpen(false);
+                          setPage(p);
+                        }}
+                      >
+                        <Icon size={21} />
+                        <span>{p}</span>
+                        <ArrowRight size={17} />
+                      </button>
+                    );
+                  })}
+              </>
+            ) : (
               <button
                 className="menu-destination"
                 disabled={busy || fatal}
                 onClick={() => {
                   setMenuOpen(false);
-                  setPage("Overview");
                   setModal({ type: "sailing" });
                 }}
               >
                 <Plus size={21} />
                 <span>New sailing</span>
               </button>
-              <button
-                className="menu-destination"
-                disabled={!sailing || busy || fatal}
-                onClick={() => {
-                  setMenuOpen(false);
-                  setPage("Overview");
-                  setSailingPickerOpen(true);
-                }}
-              >
-                <Ship size={21} />
-                <span>Your sailings</span>
-              </button>
-            </div>
-            {(Object.keys(icons) as Page[])
-              .filter((p) => p !== "Overview")
-              .map((p) => {
-                const Icon = icons[p];
-                return (
-                  <button
-                    key={p}
-                    className="menu-destination"
-                    aria-current={page === p ? "page" : undefined}
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setPage(p);
-                    }}
-                  >
-                    <Icon size={21} />
-                    <span>{p}</span>
-                    <ArrowRight size={17} />
-                  </button>
-                );
-              })}
+            )}
           </nav>
           <div className="menu-footer">
             <button

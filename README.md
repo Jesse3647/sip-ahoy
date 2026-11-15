@@ -95,6 +95,14 @@ This README is the project ledger. Update the milestone checkboxes and progress 
 
 ## Progress log
 
+### 2026-11-14 — Six opening backdrops and welcome character fades
+
+- Added five original illustrated backdrops alongside the pool deck: piano lounge, sunset deck, island beach, ship promenade, and moonlit deck. All six ship locally and are cached offline. The background advances one scene when reopening/resuming the app after at least an hour since the previous opening; quick reopens keep it, and it never rotates just from leaving the app visible.
+- The no-sailings welcome screen cycles through all six characters about every three seconds with a gentle 250ms fade out/in. Cycling pauses when offscreen, when the app is hidden, and with reduced motion. The mascot remains one stable, tappable control.
+- Without a sailing, journal navigation destinations are hidden and the app stays on Welcome aboard. New sailing, backup restore, and installation help remain available. Existing navigation returns once a sailing is created or restored.
+- Validation: production build, 49 unit tests, and 17 browser scenarios passed. Coverage includes the opening-time boundary, quick reopen and resume behavior, six offline scenes, full character rotation, reduced motion, setup-only navigation, sailor layouts/expressions, save feedback, and mobile menu gestures.
+
+
 ### 2026-11-14 — Saved sailing management and leaving sample data
 
 - Added New sailing and Your sailings menu shortcuts, making fresh journals and saved trip switching accessible outside the top picker. The picker explains that each trip is its own saved session. Creating a new trip keeps the demo and other trips available.

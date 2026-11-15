@@ -1,8 +1,14 @@
 # Quiet sailor close-ups
 
-The Overview sailing banner is a passive portrait, with no links, buttons, venue selector, speech bubbles, ambient effects, or automatic scene changes. It shows the selected sailor and at most one crewmate, shown as overlapping, complete silhouettes. The existing “Your sailors” section below the banner still selects which sailor is featured. Each expression comes from the existing `sailorReaction` rolling six-hour calculation; the banner does not calculate or imply intoxication.
+The Overview sailing banner is a passive portrait, with no links, buttons, venue selector, speech bubbles, ambient effects, or background changes while the app stays open. It shows the selected sailor and at most one crewmate, shown as overlapping, complete silhouettes. The existing “Your sailors” section below the banner still selects which sailor is featured. Each expression comes from the existing `sailorReaction` rolling six-hour calculation; the banner does not calculate or imply intoxication.
 
-`SailingScene.tsx` combines the original transparent character sheets with a clear poolside background at its natural scale. `SailorBlink.tsx` adds vector eyelids aligned separately for all six characters and all four expression cells. Existing winking eyes stay closed. The overlay is visible for approximately 130–170ms every 7.4–9.3 seconds, staggered between characters. Bodies, mouths, hats, and background remain completely still. All blinking pauses offscreen or in background tabs, and system reduced motion leaves the open-eye artwork static.
+`SailingScene.tsx` combines the original transparent character sheets with one of six clear cruise backgrounds at its natural scale. `SailorBlink.tsx` adds vector eyelids aligned separately for all six characters and all four expression cells. Existing winking eyes stay closed. The overlay is visible for approximately 130–170ms every 7.4–9.3 seconds, staggered between characters. Bodies, mouths, hats, and background remain completely still. All blinking pauses offscreen or in background tabs, and system reduced motion leaves the open-eye artwork static.
+
+## Background selection
+
+The app has six locally bundled scenes: pool deck, piano lounge, sunset deck, island beach, ship promenade, and moonlit deck. On each opening (including returning to a suspended app), it advances one scene only if at least an hour has passed since the previous opening. Quick reopens retain the current scene and reset that opening timestamp. Time passing while the app remains visible does not rotate the background. The index and last-opened time are cosmetic local preferences, independent of saved journals. Corrupt or unavailable preferences fall back safely.
+
+The five new scenes are original generated 1536×1024 illustrations, converted to quality-85 JPEGs for the offline bundle (about 3 MB combined). They share a soft matte miniature-clay style, rounded shapes, bright cruise colors, sharp scenery and open foreground space for sailors. Each was generated separately with no people, characters, logos or lettering. The prompts described a nautical piano lounge; stern deck at sunset; Caribbean beach with cabanas; a glass-roofed indoor promenade; and a moonlit deck with warm string lights. Original PNGs are retained in ignored `work/scene-art/`; shipped JPEGs are in `public/scenes/`.
 
 ## Artwork
 
