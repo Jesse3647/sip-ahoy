@@ -20,6 +20,12 @@ npm run preview -- --base=/sip-ahoy/
 
 Open the preview server's `/sip-ahoy/` URL. Journal data stays in the browser; publishing does not transfer local preview data to the hosted site. Use a JSON backup and restore to move a journal between origins.
 
+## Saved sailings and leaving the demo
+
+Each sailing is a saved session on this device, with its own travelers, packages, and drink history. To leave the sample trip, open the menu and choose **New sailing**. Create your trip, then add its travelers; the sample history stays in its own sailing.
+
+Choose **Your sailings** in the menu (or tap the current sailing picker) to reopen any previous trip or plan another one. Each saved trip has a **Delete sailing** action with confirmation. Deletion removes that trip's travelers and logs; other sailings stay intact, including shared ship menus. Deleting the active trip opens another saved trip, and deleting the final trip returns to onboarding. Export a JSON backup before deleting anything you may want to recover.
+
 ## License and image credits
 
 SipAhoy's original software is available under the [MIT License](LICENSE), also linked from the app footer as **Open source · MIT License**. Third-party dependencies retain their own licenses.
@@ -88,6 +94,13 @@ This README is the project ledger. Update the milestone checkboxes and progress 
 - Consider opt-in backend sync/shared catalogs only if file backups and nearby sharing prove insufficient. Local-only usage must remain available.
 
 ## Progress log
+
+### 2026-11-14 — Saved sailing management and leaving sample data
+
+- Added New sailing and Your sailings menu shortcuts, making fresh journals and saved trip switching accessible outside the top picker. The picker explains that each trip is its own saved session. Creating a new trip keeps the demo and other trips available.
+- Added a separate Delete sailing action per card with a named confirmation and record counts. Deletion removes only that trip's travelers/logs, retains menus shared by another trip, selects a remaining trip when necessary, and returns to onboarding after the last deletion. Failed writes preserve the existing state and surface the error.
+- Validation: 45 unit tests passed, including active/inactive/final trip deletion, unrelated-record preservation, shared catalogs, and schema validity. Browser coverage exercises leaving/reopening the demo, cancellation, persistence, every deletion case, failed writes, and responsive menu/picker behavior.
+
 
 ### 2026-11-14 — MIT footer and ship image credits
 

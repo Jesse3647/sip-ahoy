@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Check, ChevronDown, Plus } from "lucide-react";
+import { Check, ChevronDown, Plus, Trash2 } from "lucide-react";
 import type { Sailing } from "../model";
 import { ModalShell } from "./ui";
 import { ShipArtwork, ShipArtworkCredit } from "./ShipArtwork";
@@ -18,6 +17,9 @@ export function SailingPicker({
   error,
   onSelect,
   onNew,
+  open,
+  setOpen,
+  onDelete,
 }: {
   sailing: Sailing;
   sailings: Sailing[];
@@ -25,8 +27,10 @@ export function SailingPicker({
   error: string;
   onSelect: (id: string) => Promise<boolean>;
   onNew: () => void;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  onDelete: (id: string) => Promise<boolean>;
 }) {
-  const [open, setOpen] = useState(false);
   return (
     <>
       <div className="sailing-switch">
@@ -65,7 +69,9 @@ export function SailingPicker({
           }}
         >
           <p className="sailing-picker-intro">
-            Pick a trip. Let’s get back on board.
+            Each sailing is a saved session with its own travelers and drink
+            logs. Open a previous trip or start a fresh one; your other sailings
+            stay saved.
           </p>
           {error && (
             <div className="banner error" role="alert">
@@ -74,31 +80,40 @@ export function SailingPicker({
           )}
           <div className="sailing-options">
             {sailings.map((trip) => (
-              <button
-                key={trip.id}
-                className="sailing-option"
-                aria-label={`Select ${trip.name}`}
-                aria-pressed={trip.id === sailing.id}
-                disabled={busy}
-                onClick={async () => {
-                  if (trip.id === sailing.id || (await onSelect(trip.id)))
-                    setOpen(false);
-                }}
-              >
-                <ShipArtwork ship={trip.ship} />
-                <span className="sailing-option-copy">
-                  <span className="sailing-option-ship">{trip.ship}</span>
-                  <strong>{trip.name}</strong>
-                  <span className="sailing-option-dates">
-                    {fullDate(trip.start)} – {fullDate(trip.end)}
-                  </span>
-                  {trip.id === sailing.id && (
-                    <span className="sailing-selected">
-                      <Check size={14} /> Current sailing
+              <div key={trip.id} className="sailing-option-group">
+                <button
+                  className="sailing-option"
+                  aria-label={`Select ${trip.name}`}
+                  aria-pressed={trip.id === sailing.id}
+                  disabled={busy}
+                  onClick={async () => {
+                    if (trip.id === sailing.id || (await onSelect(trip.id)))
+                      setOpen(false);
+                  }}
+                >
+                  <ShipArtwork ship={trip.ship} />
+                  <span className="sailing-option-copy">
+                    <span className="sailing-option-ship">{trip.ship}</span>
+                    <strong>{trip.name}</strong>
+                    <span className="sailing-option-dates">
+                      {fullDate(trip.start)} – {fullDate(trip.end)}
                     </span>
-                  )}
-                </span>
-              </button>
+                    {trip.id === sailing.id && (
+                      <span className="sailing-selected">
+                        <Check size={14} /> Current sailing
+                      </span>
+                    )}
+                  </span>
+                </button>
+                <button
+                  className="sailing-delete"
+                  aria-label={`Delete ${trip.name}`}
+                  disabled={busy}
+                  onClick={() => onDelete(trip.id)}
+                >
+                  <Trash2 size={16} /> Delete sailing
+                </button>
+              </div>
             ))}
           </div>
           <button

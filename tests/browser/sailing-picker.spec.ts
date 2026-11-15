@@ -130,3 +130,145 @@ test("fleet artwork is cached offline and cards fit small screens", async ({
     );
   await page.screenshot({ path: "test-results/sailing-setup.png" });
 });
+
+test("leave the demo, reopen saved trips, and delete inactive, active and final sailings", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await page
+    .getByRole("button", { name: "Take a look with sample data" })
+    .click();
+  const menuAction = async (name: string) => {
+    await page.getByRole("button", { name: "Open menu", exact: true }).click();
+    await page
+      .getByRole("navigation", { name: "Main navigation" })
+      .getByRole("button", { name, exact: true })
+      .click();
+  };
+  const create = async (name: string) => {
+    await menuAction("New sailing");
+    await page.getByLabel("Sailing name", { exact: true }).fill(name);
+    await page
+      .getByRole("combobox", { name: "Ship", exact: true })
+      .selectOption("Wonder of the Seas");
+    await page.getByLabel("First day").fill("2027-02-01");
+    await page.getByLabel("Last day").fill("2027-02-08");
+    await page
+      .getByRole("button", { name: "Create sailing", exact: true })
+      .click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+  };
+  await create("My cruise");
+  const trigger = page.getByRole("button", { name: /^Change sailing:/ });
+  await expect(trigger).toContainText("My cruise");
+  await expect(page.locator(".stat").first().locator("strong")).toHaveText("0");
+  await menuAction("Your sailings");
+  await page
+    .getByRole("button", {
+      name: "Select A little Caribbean escape",
+      exact: true,
+    })
+    .click();
+  await expect(page.locator(".stat").first().locator("strong")).toHaveText(
+    "18",
+  );
+  await page.reload();
+  await expect(trigger).toContainText("A little Caribbean escape");
+  await menuAction("Your sailings");
+  await page
+    .getByRole("button", { name: "Select My cruise", exact: true })
+    .click();
+  await menuAction("Your sailings");
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page
+    .getByRole("button", {
+      name: "Delete A little Caribbean escape",
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByRole("button", {
+      name: "Select A little Caribbean escape",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page.screenshot({ path: "test-results/manage-sailings.png" });
+  page.once("dialog", (dialog) => dialog.accept());
+  await page
+    .getByRole("button", {
+      name: "Delete A little Caribbean escape",
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByRole("button", {
+      name: "Select A little Caribbean escape",
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "Close dialog", exact: true }).click();
+  await expect(trigger).toContainText("My cruise");
+  await create("Second cruise");
+  await menuAction("Your sailings");
+  page.once("dialog", (dialog) => dialog.accept());
+  await page
+    .getByRole("button", { name: "Delete Second cruise", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Select My cruise", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Close dialog", exact: true }).click();
+  await page.reload();
+  await expect(trigger).toContainText("My cruise");
+  await menuAction("Your sailings");
+  page.once("dialog", (dialog) => dialog.accept());
+  await page
+    .getByRole("button", { name: "Delete My cruise", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Create your first sailing" }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Create your first sailing" }),
+  ).toBeVisible();
+});
+
+test("a failed deletion preserves the saved sailing", async ({ page }) => {
+  await page.goto("/");
+  await page
+    .getByRole("button", { name: "Take a look with sample data" })
+    .click();
+  await page.getByRole("button", { name: /^Change sailing:/ }).click();
+  await page.evaluate(() => {
+    const original = IDBObjectStore.prototype.put;
+    IDBObjectStore.prototype.put = function (
+      ...args: Parameters<IDBObjectStore["put"]>
+    ) {
+      if (this.name === "state")
+        throw new DOMException("Storage full", "QuotaExceededError");
+      return original.apply(this, args);
+    };
+  });
+  page.once("dialog", (dialog) => dialog.accept());
+  await page
+    .getByRole("button", {
+      name: "Delete A little Caribbean escape",
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByRole("dialog", { name: "Your sailings" }).getByRole("alert"),
+  ).toContainText("could not be saved");
+  await expect(
+    page.getByRole("button", {
+      name: "Select A little Caribbean escape",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: /^Change sailing:/ }),
+  ).toContainText("A little Caribbean escape");
+});

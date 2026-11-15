@@ -30,6 +30,7 @@ import {
   categories,
   days,
   demoData,
+  removeSailing,
   emptyData,
   money,
   shipCatalog,
@@ -109,6 +110,7 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [page, setPage] = useState<Page>("Overview");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [sailingPickerOpen, setSailingPickerOpen] = useState(false);
   const [modal, setModal] = useState<Modal>(null);
   const [notice, setNotice] = useState("");
   const [celebration, setCelebration] = useState<{
@@ -542,7 +544,30 @@ export default function App() {
               <SailingPicker
                 sailing={sailing}
                 sailings={data.sailings}
-                busy={busy}
+                busy={busy || fatal}
+                open={sailingPickerOpen}
+                setOpen={setSailingPickerOpen}
+                onDelete={async (id) => {
+                  const trip = data.sailings.find((item) => item.id === id);
+                  if (!trip || busy || fatal) return false;
+                  const logs = data.entries.filter(
+                    (entry) => entry.sailingId === id,
+                  ).length;
+                  const travelers = data.travelers.filter(
+                    (traveler) => traveler.sailingId === id,
+                  ).length;
+                  if (
+                    !confirm(
+                      `Delete “${trip.name}”? This permanently deletes its ${logs} drink logs and ${travelers} travelers. Other sailings are kept. This cannot be undone; export a backup first if you want to keep a copy.`,
+                    )
+                  )
+                    return false;
+                  const next = removeSailing(data, id);
+                  const saved = await save(next, "Sailing deleted");
+                  if (saved && !next.sailings.length)
+                    setSailingPickerOpen(false);
+                  return saved;
+                }}
                 error={error}
                 onSelect={(id) =>
                   save({ ...data, activeSailingId: id }, "Sailing switched")
@@ -1199,6 +1224,32 @@ export default function App() {
               >
                 <Plus size={24} />
                 <span>Log a drink</span>
+              </button>
+            </div>
+            <div className="menu-session-actions">
+              <button
+                className="menu-destination"
+                disabled={busy || fatal}
+                onClick={() => {
+                  setMenuOpen(false);
+                  setPage("Overview");
+                  setModal({ type: "sailing" });
+                }}
+              >
+                <Plus size={21} />
+                <span>New sailing</span>
+              </button>
+              <button
+                className="menu-destination"
+                disabled={!sailing || busy || fatal}
+                onClick={() => {
+                  setMenuOpen(false);
+                  setPage("Overview");
+                  setSailingPickerOpen(true);
+                }}
+              >
+                <Ship size={21} />
+                <span>Your sailings</span>
               </button>
             </div>
             {(Object.keys(icons) as Page[])

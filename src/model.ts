@@ -252,6 +252,34 @@ export const dataSchema = z
   });
 /** Complete persisted journal, inferred from the runtime validation contract. */
 export type Data = z.infer<typeof dataSchema>;
+
+/** Deletes a trip and its private records; retains menus used by another trip on the same ship. */
+export function removeSailing(data: Data, sailingId: string): Data {
+  const removed = data.sailings.find((sailing) => sailing.id === sailingId);
+  if (!removed) return data;
+  const sailings = data.sailings.filter((sailing) => sailing.id !== sailingId);
+  const sharedShip = sailings.some(
+    (sailing) => sailing.shipId === removed.shipId,
+  );
+  return {
+    ...data,
+    sailings,
+    activeSailingId:
+      data.activeSailingId === sailingId
+        ? (sailings[0]?.id ?? null)
+        : data.activeSailingId,
+    travelers: data.travelers.filter(
+      (traveler) => traveler.sailingId !== sailingId,
+    ),
+    entries: data.entries.filter((entry) => entry.sailingId !== sailingId),
+    drinks: sharedShip
+      ? data.drinks
+      : data.drinks.filter((drink) => drink.shipId !== removed.shipId),
+    venues: sharedShip
+      ? data.venues
+      : data.venues.filter((venue) => venue.shipId !== removed.shipId),
+  };
+}
 /** A trip with inclusive date bounds and a shared ship-catalog namespace. */
 export type Sailing = Data["sailings"][number];
 /** A person on one sailing, including optional package settings. */

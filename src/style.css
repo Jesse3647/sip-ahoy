@@ -4102,6 +4102,19 @@ dialog[data-sheet] .modal-head {
 .menu-destination > span {
   flex: 1;
 }
+.menu-session-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.menu-session-actions .menu-destination {
+  gap: 7px;
+  padding: 10px;
+  min-height: 44px;
+  font-size: 12px;
+  background: #eef1ff;
+}
 .menu-destination > svg:last-child {
   opacity: 0.45;
 }
@@ -4429,6 +4442,19 @@ dialog[data-closing="true"] {
 .sailing-options {
   display: grid;
   gap: 16px;
+}
+.sailing-option-group {
+  min-width: 0;
+}
+.sailing-delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 12px;
+  color: #a43545;
+  font-size: 12px;
+  font-weight: 650;
 }
 .sailing-option {
   padding: 0;
