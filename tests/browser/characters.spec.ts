@@ -251,7 +251,7 @@ test("sailor close-ups are passive, blink without body motion, and stay availabl
   await expect(
     page.locator(".hero button, .hero a, .hero [tabindex]"),
   ).toHaveCount(0);
-  await expect(scene.locator(".sailor-closeup")).toHaveCount(2);
+  await expect(scene.locator(".sailor-closeup")).toHaveCount(4);
   await expect(scene.locator(".sailor-blink").first()).toHaveCSS(
     "animation-name",
     "sailor-eyelids",
@@ -292,7 +292,27 @@ test("sailor close-ups are passive, blink without body motion, and stay availabl
       expect(box!.y).toBeGreaterThanOrEqual(stage.y);
       expect(box!.y + box!.height).toBeLessThanOrEqual(stage.y + stage.height);
     }
-    expect(bounds[0]!.x + bounds[0]!.width).toBeGreaterThan(bounds[1]!.x);
+    if (width > 700)
+      expect(bounds[0]!.x + bounds[0]!.width).toBeGreaterThan(bounds[1]!.x);
+    else {
+      const frontLeft = bounds[2]!.x + bounds[2]!.width / 2;
+      const frontRight = bounds[3]!.x + bounds[3]!.width / 2;
+      for (const [index, rear] of bounds.slice(0, 2).entries()) {
+        expect(rear!.x + rear!.width / 2).toBeGreaterThan(frontLeft);
+        if (index === 0)
+          expect(rear!.x + rear!.width / 2).toBeLessThan(frontRight);
+        else expect(rear!.x + rear!.width / 2).toBeGreaterThan(frontRight);
+        const depth = bounds[2]!.y + bounds[2]!.height - rear!.y - rear!.height;
+        expect(depth).toBeGreaterThan(0);
+        expect(depth).toBeLessThan(80);
+      }
+      const layers = await scene
+        .locator(".sailor-closeup")
+        .evaluateAll((els) =>
+          els.map((el) => Number(getComputedStyle(el).zIndex)),
+        );
+      expect(layers[2]).toBeGreaterThan(layers[0]);
+    }
     await expect(scene.locator(".sailor-crop").first()).toHaveCSS(
       "overflow",
       "visible",
@@ -334,7 +354,7 @@ test("sailor close-ups are passive, blink without body motion, and stay availabl
         return image.naturalWidth > 0;
       }),
   ).toBe(true);
-  await expect(scene.locator(".sailor-closeup")).toHaveCount(2);
+  await expect(scene.locator(".sailor-closeup")).toHaveCount(4);
 });
 
 test("a solo sailor stays fully inside the banner without visible captions", async ({

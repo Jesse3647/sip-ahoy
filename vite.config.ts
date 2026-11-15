@@ -61,6 +61,9 @@ export default defineConfig({
       },
       // Bundled menus ship inside the JavaScript cache; runtime source-site requests are unnecessary.
       workbox: {
+        // A first install must serve unvisited images offline in the already-open
+        // page; without this it stays uncontrolled until the next navigation.
+        clientsClaim: true,
         globPatterns: ["**/*.{js,css,html,svg,png,jpg,webp,woff2}"],
         navigateFallback: "index.html",
       },

@@ -22,11 +22,11 @@ export function SailingScene({
   const [active, setActive] = useState(false);
   const stage = useRef<HTMLDivElement>(null);
   const selected = crew.find((sailor) => sailor.id === selectedId) ?? crew[0];
-  // Keep faces large, even on phones. The selected sailor always stays in the close-up.
+  // Always include the selected sailor; mobile uses two rows for larger crews.
   const visibleCrew = selected
     ? [selected, ...crew.filter((sailor) => sailor.id !== selected.id)].slice(
         0,
-        2,
+        4,
       )
     : [];
   useEffect(() => {

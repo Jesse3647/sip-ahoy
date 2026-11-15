@@ -95,6 +95,20 @@ This README is the project ledger. Update the milestone checkboxes and progress 
 
 ## Progress log
 
+### 2026-11-14 — Grounded mobile sailor group
+
+- Replaced the separated two-by-two rows with a compact, staggered deck grouping. Rear sailors are slightly smaller and centered between the foreground pair, with their baseline only 48px higher and explicit depth layering. Three-person groups use one centered rear sailor. One/two-person and desktop arrangements are unchanged.
+- Validation: production build and the character scene browser scenario passed across 320px, 390px, tablet, and desktop sizes. Verified all silhouettes stay in bounds, rear centers sit between foreground sailors, the baseline separation stays below 80px, and the front layer paints above the rear. Reviewed the 390px group against the clear pool-deck backdrop.
+
+
+### 2026-11-14 — First-visit offline images and four-sailor banners
+
+- Reproduced a first-install offline failure: the complete image list was precached, but the already-open page had no service-worker controller, so an unvisited image failed offline until navigation. Enabled Workbox clientsClaim so activation controls the current page immediately, and registered the worker without waiting for page load. App updates still require the existing explicit update action.
+- Added a menu-only offline setup status so the installed app can confirm that files are ready. The install manifest remains for application identity/icons; offline images are managed by the service worker's precache list. Confirmed the deployed worker includes all six scenes.
+- Increased the banner to four sailors, always including the selected one. Three/four sailors use two rows on phones; desktop retains an overlapping row. Single and paired portraits keep their larger layout.
+- Validation: production build and 15 browser scenarios passed. The new regression starts with a fresh, never-reloaded page, disconnects the network after worker activation, and successfully requests every image, including previously unvisited scenes and ship art. Four-sailor bounds, expressions, selection of additional crew, responsive layouts, reduced motion, live reaction expiry, and existing menu gestures also passed. Reviewed the four-sailor banner at 390px.
+
+
 ### 2026-11-14 — Six opening backdrops and welcome character fades
 
 - Added five original illustrated backdrops alongside the pool deck: piano lounge, sunset deck, island beach, ship promenade, and moonlit deck. All six ship locally and are cached offline. The background advances one scene when reopening/resuming the app after at least an hour since the previous opening; quick reopens keep it, and it never rotates just from leaving the app visible.

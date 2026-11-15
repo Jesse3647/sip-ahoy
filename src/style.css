@@ -4719,6 +4719,12 @@ dialog[data-closing="true"] {
   width: min(64%, calc(100cqh - 24px));
   max-width: 300px;
 }
+.portrait-crew[data-count="3"] .sailor-closeup {
+  width: min(33.333%, calc(83.333cqh - 20px));
+}
+.portrait-crew[data-count="4"] .sailor-closeup {
+  width: min(25%, calc(83.333cqh - 20px));
+}
 .portrait-crew[data-count="1"] .sailor-crop {
   aspect-ratio: 1;
 }
@@ -4779,6 +4785,40 @@ dialog[data-closing="true"] {
   }
   .sailing-scene {
     height: 290px;
+  }
+  /* One grounded group: the rear sailors stand just behind the front pair,
+     staggered toward the center instead of occupying a floating upper row. */
+  .portrait-crew:is([data-count="3"], [data-count="4"]) {
+    display: block;
+  }
+  .portrait-crew:is([data-count="3"], [data-count="4"]) .sailor-closeup {
+    position: absolute;
+    bottom: 0;
+    left: 16%;
+    translate: -50% 0;
+    width: min(42%, calc(62.5cqh - 20px));
+    z-index: 3;
+  }
+  .portrait-crew[data-count="4"] .sailor-closeup:nth-child(-n + 2),
+  .portrait-crew[data-count="3"] .sailor-closeup:first-child {
+    bottom: 48px;
+    width: min(36%, calc(58.333cqh - 20px));
+    z-index: 1;
+  }
+  .portrait-crew[data-count="4"] .sailor-closeup:first-child {
+    left: 39%;
+  }
+  .portrait-crew[data-count="4"] .sailor-closeup:nth-child(2) {
+    left: 87.5%;
+  }
+  .portrait-crew[data-count="4"] .sailor-closeup:last-child {
+    left: 69%;
+  }
+  .portrait-crew[data-count="3"] .sailor-closeup:last-child {
+    left: 80%;
+  }
+  .portrait-crew[data-count="3"] .sailor-closeup:first-child {
+    left: 52%;
   }
   .sailing-scene::before {
     background: linear-gradient(

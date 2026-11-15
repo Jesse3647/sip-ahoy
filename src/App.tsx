@@ -148,6 +148,26 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [online, setOnline] = useState(navigator.onLine);
+  const [offlineState, setOfflineState] = useState<
+    "preparing" | "ready" | "unavailable"
+  >("preparing");
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) {
+      setOfflineState("unavailable");
+      return;
+    }
+    const controlled = () =>
+      setOfflineState(
+        navigator.serviceWorker.controller ? "ready" : "preparing",
+      );
+    controlled();
+    navigator.serviceWorker.addEventListener("controllerchange", controlled);
+    return () =>
+      navigator.serviceWorker.removeEventListener(
+        "controllerchange",
+        controlled,
+      );
+  }, []);
   const [allShips, setAllShips] = useState(false);
   const [menuLimit, setMenuLimit] = useState(36);
   /** Notifies other local tabs to reload; persistence remains in IndexedDB. */
@@ -158,7 +178,9 @@ export default function App() {
     needRefresh: [needRefresh],
     updateServiceWorker,
   } = useRegisterSW({
+    immediate: true,
     onRegisterError() {
+      setOfflineState("unavailable");
       setNotice(
         "Offline cache is unavailable. Your journal can still save on this device.",
       );
@@ -1298,6 +1320,15 @@ export default function App() {
             )}
           </nav>
           <div className="menu-footer">
+            <p className="footnote" role="status">
+              {offlineState === "ready"
+                ? "Offline files ready, including all images."
+                : offlineState === "unavailable"
+                  ? "Offline setup is unavailable. Reopen the app online to try again."
+                  : online
+                    ? "Downloading offline files. Keep the app open until ready."
+                    : "Offline files are not ready. Reconnect to finish downloading."}
+            </p>
             <button
               className="plain"
               onClick={() => {
