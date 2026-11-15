@@ -23,7 +23,6 @@ export function CrewReactions({
     <section className="card crew-reactions" aria-label="Sailor characters">
       <div className="reaction-heading">
         <h2>Your sailors</h2>
-        <span className="footnote">Last 6 hours</span>
       </div>
       <div className="sailor-strip">
         {crew.map((traveler) => {
