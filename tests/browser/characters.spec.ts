@@ -45,9 +45,7 @@ test("each sailor keeps an independent character through reload, backup restore,
     path: "test-results/sailor-character-picker.png",
     animations: "disabled",
   });
-  await page
-    .getByRole("button", { name: "Save traveler", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Save sailor", exact: true }).click();
   await expect(
     page.locator('.sailor-closeup[data-selected="true"] .character-portrait'),
   ).toHaveAttribute("data-character", "pearl");
@@ -79,9 +77,7 @@ test("each sailor keeps an independent character through reload, backup restore,
     .getByRole("button", { name: "Change character", exact: true })
     .click();
   await page.getByRole("radio", { name: "Finn, Dolphin", exact: true }).check();
-  await page
-    .getByRole("button", { name: "Save traveler", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Save sailor", exact: true }).click();
   await restore(page, exported.data);
   await expect(
     page.locator('.sailor-closeup[data-selected="true"] .character-portrait'),
@@ -115,8 +111,8 @@ test("each sailor keeps an independent character through reload, backup restore,
   expect(loaded).toEqual([true, true, true, true, true, true]);
   await page.getByRole("button", { name: "Close dialog", exact: true }).click();
   await navigate(page, "Sailing & crew");
-  await page.getByRole("button", { name: "Add traveler", exact: true }).click();
-  await expect(page.getByLabel("Traveler name")).toHaveValue("");
+  await page.getByRole("button", { name: "Add sailor", exact: true }).click();
+  await expect(page.getByLabel("Sailor name")).toHaveValue("");
   // The suggested character is the first unused one, independent of the package template.
   await expect(
     page.getByRole("radio", { name: "Skipper, Octopus captain", exact: true }),
@@ -300,7 +296,9 @@ test("sailor close-ups are passive, blink without body motion, and stay availabl
       for (const [index, rear] of bounds.slice(0, 2).entries()) {
         expect(rear!.x + rear!.width / 2).toBeGreaterThan(frontLeft);
         if (index === 0)
-          expect(rear!.x + rear!.width / 2).toBeLessThan(frontRight);
+          expect(
+            Math.abs(rear!.x + rear!.width / 2 - (frontLeft + frontRight) / 2),
+          ).toBeLessThan(1);
         else expect(rear!.x + rear!.width / 2).toBeGreaterThan(frontRight);
         const depth = bounds[2]!.y + bounds[2]!.height - rear!.y - rear!.height;
         expect(depth).toBeGreaterThan(0);
@@ -434,4 +432,44 @@ test("live reactions update as water and alcohol leave the six-hour window witho
   await expect(
     page.getByRole("button", { name: "Show Alex's character", exact: true }),
   ).toContainText("0 logged · 0 alcohol");
+});
+
+test("three sailors keep the rear sailor exactly centered between the foreground pair", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const fixture = demoData();
+  fixture.travelers.push({
+    ...fixture.travelers[0],
+    id: "third-sailor",
+    name: "Jesse",
+    characterId: "finn",
+  });
+  await restore(page, fixture);
+  const scene = page.locator(".sailing-scene");
+  await expect(scene.locator(".sailor-face")).toHaveCount(3);
+  for (const width of [320, 390, 640]) {
+    await page.setViewportSize({ width, height: 900 });
+    const stage = (await scene.boundingBox())!;
+    const boxes = await Promise.all(
+      (await scene.locator(".sailor-face").all()).map((face) =>
+        face.boundingBox(),
+      ),
+    );
+    const centers = boxes.map((box) => box!.x + box!.width / 2);
+    expect(Math.abs(centers[0] - (centers[1] + centers[2]) / 2)).toBeLessThan(
+      1,
+    );
+    for (const box of boxes) {
+      expect(box!.x).toBeGreaterThanOrEqual(stage.x);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(stage.x + stage.width);
+    }
+    if (width === 390)
+      await page
+        .locator(".hero")
+        .screenshot({
+          path: "test-results/three-sailors-centered.png",
+          animations: "disabled",
+        });
+  }
 });

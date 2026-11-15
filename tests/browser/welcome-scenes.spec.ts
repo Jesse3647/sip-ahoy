@@ -65,7 +65,7 @@ test("without a sailing only setup actions are available", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("background advances only on an opening at least an hour after the previous opening", async ({
+test("navigation and relaunch choose a different random scene after an hour without resetting the timer early", async ({
   page,
 }) => {
   const initial = new Date("2026-11-14T12:00:00Z");
@@ -75,25 +75,47 @@ test("background advances only on an opening at least an hour after the previous
     .getByRole("button", { name: "Take a look with sample data" })
     .click();
   const scene = page.locator(".sailing-scene");
-  await expect(scene).toHaveAttribute("data-scene", "pool-deck");
+  await expect(scene).toBeVisible();
+  const first = await scene.getAttribute("data-scene");
+  const firstChanged = await page.evaluate(
+    () =>
+      JSON.parse(localStorage.getItem("sipahoy-opening-scene")!)
+        .lastChanged as number,
+  );
+  const navigate = async (name: string) => {
+    await page.getByRole("button", { name: "Open menu", exact: true }).click();
+    await page
+      .getByRole("navigation", { name: "Main navigation" })
+      .getByRole("button", { name, exact: true })
+      .click();
+  };
   await page.clock.setSystemTime(new Date(initial.getTime() + hour - 1000));
   await page.reload();
-  await expect(scene).toHaveAttribute("data-scene", "pool-deck");
-  await page.clock.setSystemTime(
-    new Date(initial.getTime() + 2 * hour + 10000),
-  );
-  await expect(scene).toHaveAttribute("data-scene", "pool-deck");
+  await expect(scene).toHaveAttribute("data-scene", first!);
+  expect(
+    await page.evaluate(
+      () =>
+        JSON.parse(localStorage.getItem("sipahoy-opening-scene")!).lastChanged,
+    ),
+  ).toBe(firstChanged);
+  await page.clock.setSystemTime(new Date(initial.getTime() + hour + 10000));
+  await expect(scene).toHaveAttribute("data-scene", first!);
+  await navigate("Drink log");
+  await navigate("Home");
+  await expect(scene).not.toHaveAttribute("data-scene", first!);
+  const second = await scene.getAttribute("data-scene");
   await page.reload();
-  await expect(scene).toHaveAttribute("data-scene", "piano-lounge");
+  await expect(scene).toHaveAttribute("data-scene", second!);
+  await page.clock.setSystemTime(new Date(initial.getTime() + 3 * hour));
   await page.reload();
-  await expect(scene).toHaveAttribute("data-scene", "piano-lounge");
-  await page.clock.setSystemTime(new Date(initial.getTime() + 10 * hour));
-  await expect(scene).toHaveAttribute("data-scene", "piano-lounge");
-  // Simulate a suspended Home Screen app resuming after a long absence.
+  await expect(scene).not.toHaveAttribute("data-scene", second!);
+  const third = await scene.getAttribute("data-scene");
+  await page.clock.setSystemTime(new Date(initial.getTime() + 5 * hour));
+  await expect(scene).toHaveAttribute("data-scene", third!);
   await page.evaluate(() =>
     document.dispatchEvent(new Event("visibilitychange")),
   );
-  await expect(scene).toHaveAttribute("data-scene", "sunset-deck");
+  await expect(scene).not.toHaveAttribute("data-scene", third!);
 });
 
 test("all six backgrounds are readable offline and on phone layouts", async ({
@@ -113,7 +135,7 @@ test("all six backgrounds are readable offline and on phone layouts", async ({
       (index) =>
         localStorage.setItem(
           "sipahoy-opening-scene",
-          JSON.stringify({ index, lastOpened: Date.now() }),
+          JSON.stringify({ index, lastChanged: Date.now() }),
         ),
       index,
     );

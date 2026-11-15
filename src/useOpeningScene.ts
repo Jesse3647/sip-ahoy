@@ -6,16 +6,18 @@ import {
   type SceneOpening,
 } from "./scenes";
 
-/** Opening/resuming can change the backdrop; time passing while visible never does. */
-export function useOpeningScene() {
+/** Navigation, opening and resuming check the hour since the last actual change. */
+export function useOpeningScene(navigationKey: string) {
   const [index, setIndex] = useState(0);
-  const started = useRef(false);
   const fallback = useRef<SceneOpening | null>(null);
   useLayoutEffect(() => {
     const opened = () => {
       let previous: unknown = fallback.current;
       try {
-        previous = JSON.parse(localStorage.getItem(sceneStorageKey) ?? "null");
+        if (!previous)
+          previous = JSON.parse(
+            localStorage.getItem(sceneStorageKey) ?? "null",
+          );
       } catch {
         /* Use this visit's state if storage is unavailable. */
       }
@@ -28,10 +30,7 @@ export function useOpeningScene() {
       }
       setIndex(next.index);
     };
-    if (!started.current) {
-      started.current = true;
-      opened();
-    }
+    opened();
     const visible = () => {
       if (!document.hidden) opened();
     };
@@ -44,6 +43,6 @@ export function useOpeningScene() {
       document.removeEventListener("visibilitychange", visible);
       window.removeEventListener("pageshow", restored);
     };
-  }, []);
+  }, [navigationKey]);
   return scenes[index];
 }

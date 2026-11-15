@@ -4790,11 +4790,16 @@ dialog[data-closing="true"] {
      staggered toward the center instead of occupying a floating upper row. */
   .portrait-crew:is([data-count="3"], [data-count="4"]) {
     display: block;
+    --front-left: 16%;
+    --front-right: 69%;
+  }
+  .portrait-crew[data-count="3"] {
+    --front-right: 80%;
   }
   .portrait-crew:is([data-count="3"], [data-count="4"]) .sailor-closeup {
     position: absolute;
     bottom: 0;
-    left: 16%;
+    left: var(--front-left);
     translate: -50% 0;
     width: min(42%, calc(62.5cqh - 20px));
     z-index: 3;
@@ -4806,19 +4811,19 @@ dialog[data-closing="true"] {
     z-index: 1;
   }
   .portrait-crew[data-count="4"] .sailor-closeup:first-child {
-    left: 39%;
+    left: calc((var(--front-left) + var(--front-right)) / 2);
   }
   .portrait-crew[data-count="4"] .sailor-closeup:nth-child(2) {
     left: 87.5%;
   }
   .portrait-crew[data-count="4"] .sailor-closeup:last-child {
-    left: 69%;
+    left: var(--front-right);
   }
   .portrait-crew[data-count="3"] .sailor-closeup:last-child {
-    left: 80%;
+    left: var(--front-right);
   }
   .portrait-crew[data-count="3"] .sailor-closeup:first-child {
-    left: 52%;
+    left: calc((var(--front-left) + var(--front-right)) / 2);
   }
   .sailing-scene::before {
     background: linear-gradient(
@@ -4839,4 +4844,11 @@ dialog[data-closing="true"] {
   .sailing-scene {
     height: 250px;
   }
+}
+
+dialog form > .button.delete-sailor {
+  position: static;
+  color: #a43545;
+  background: #fff2f2;
+  border-color: #f3ccd1;
 }

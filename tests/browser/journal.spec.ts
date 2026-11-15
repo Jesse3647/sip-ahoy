@@ -211,14 +211,14 @@ test("setup, venue prices, package cap, logging, backups, and offline persistenc
   await page.getByRole("button", { name: "Save sailing", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await navigate(page, "Overview");
-  await page.getByRole("button", { name: "Add traveler", exact: true }).click();
-  await page.getByLabel("Traveler name").fill("Jesse");
-  await page.getByLabel("This traveler has a drink package").check();
+  await page.getByRole("button", { name: "Add sailor", exact: true }).click();
+  await page.getByLabel("Sailor name").fill("Jesse");
+  await page.getByLabel("This sailor has a drink package").check();
   await page.getByLabel("Package cost per day").fill("60");
   await page.getByLabel("Days charged").fill("7");
   await page.getByLabel("Gratuities in this price?").selectOption("included");
   await page.getByLabel("Maximum covered per drink").fill("12");
-  await page.getByRole("button", { name: "Save traveler" }).click();
+  await page.getByRole("button", { name: "Save sailor" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await navigate(page, "Menus & prices");
   await page.getByLabel("Search ship menu").fill("Piña Colada");
@@ -350,9 +350,9 @@ test("sample dashboard and mobile layouts stay usable", async ({ page }) => {
       ),
     ).toBe(true);
   }
-  await page.getByRole("button", { name: "Add traveler", exact: true }).click();
-  await page.getByLabel("Traveler name").fill("Guest");
-  await page.getByRole("button", { name: "Save traveler" }).click();
+  await page.getByRole("button", { name: "Add sailor", exact: true }).click();
+  await page.getByLabel("Sailor name").fill("Guest");
+  await page.getByRole("button", { name: "Save sailor" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(
     page.getByRole("heading", { name: "Guest", exact: true }),
@@ -410,9 +410,7 @@ test("daily and trip bundles show separate paid and drink-only totals, including
   await expect(breakdown).toContainText("$466.40");
   await breakdown.scrollIntoViewIfNeeded();
   await page.screenshot({ path: "test-results/package-pricing.png" });
-  await page
-    .getByRole("button", { name: "Save traveler", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Save sailor", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.locator(".package-numbers").first()).toContainText(
     "$378.40 to break even (estimate)",
@@ -426,9 +424,7 @@ test("daily and trip bundles show separate paid and drink-only totals, including
   await page.getByLabel("Gratuities in this price?").selectOption("included");
   await page.getByLabel("Other taxes / fees").fill("10");
   await expect(breakdown).toContainText("$510.00");
-  await page
-    .getByRole("button", { name: "Save traveler", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Save sailor", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.reload();
   await navigate(page, "Sailing & crew");
@@ -440,9 +436,7 @@ test("daily and trip bundles show separate paid and drink-only totals, including
     .filter({ has: page.getByRole("heading", { name: "Alex", exact: true }) })
     .click();
   await page.getByLabel("Extra 1 non-drink value").fill("");
-  await page
-    .getByRole("button", { name: "Save traveler", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Save sailor", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.locator(".package-numbers").first()).toContainText(
     "Bundled extra value not entered",
@@ -452,7 +446,7 @@ test("daily and trip bundles show separate paid and drink-only totals, including
   );
 });
 
-test("community drink search, traveler recents, local price overrides, custom drinks, and offline library", async ({
+test("community drink search, sailor recents, local price overrides, custom drinks, and offline library", async ({
   page,
   context,
 }) => {
@@ -687,7 +681,7 @@ test("Bionic Bar is available on Wonder and time is captured on save without a t
   expect(edited.notes).toBe("Updated note");
 });
 
-test("drink log combines search with traveler filtering and new travelers inherit independent package settings", async ({
+test("drink log combines search with sailor filtering and new sailors inherit independent package settings", async ({
   page,
 }) => {
   await page.goto("/");
@@ -697,7 +691,7 @@ test("drink log combines search with traveler filtering and new travelers inheri
   await navigate(page, "Drink log");
   await expect(page.getByLabel("Search drink log")).toBeVisible();
   await expect(page.locator(".log-row")).toHaveCount(18);
-  await page.getByLabel("Filter by traveler").selectOption({ label: "Alex" });
+  await page.getByLabel("Filter by sailor").selectOption({ label: "Alex" });
   await expect(page.locator(".log-row")).toHaveCount(9);
   const drinkName = await page.locator(".log-row h3").first().textContent();
   await page.getByLabel("Search drink log").fill(drinkName!);
@@ -717,7 +711,7 @@ test("drink log combines search with traveler filtering and new travelers inheri
     .getByRole("button")
     .filter({ has: page.getByRole("heading", { name: "Sam", exact: true }) })
     .click();
-  await page.getByLabel("This traveler has a drink package").check();
+  await page.getByLabel("This sailor has a drink package").check();
   await page.getByLabel("Price entered as").selectOption("trip");
   await page.getByLabel("Package cost for whole trip").fill("600");
   await page.getByLabel("Gratuities in this price?").selectOption("fixed");
@@ -729,14 +723,12 @@ test("drink log combines search with traveler filtering and new travelers inheri
   await page.getByLabel("Extra 1 non-drink value").fill("100");
   await page.getByLabel("Extra 1 value source").selectOption("receipt");
   await page.getByLabel("Maximum covered per drink").fill("15");
-  await page
-    .getByRole("button", { name: "Save traveler", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Save sailor", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page.getByRole("button", { name: "Add traveler", exact: true }).click();
-  await expect(page.getByLabel("Traveler name")).toHaveValue("");
+  await page.getByRole("button", { name: "Add sailor", exact: true }).click();
+  await expect(page.getByLabel("Sailor name")).toHaveValue("");
   await expect(
-    page.getByLabel("This traveler has a drink package"),
+    page.getByLabel("This sailor has a drink package"),
   ).toBeChecked();
   await expect(page.getByLabel("Price entered as")).toHaveValue("trip");
   await expect(page.getByLabel("Package cost for whole trip")).toHaveValue(
@@ -759,12 +751,10 @@ test("drink log combines search with traveler filtering and new travelers inheri
   await expect(page.getByLabel("Maximum covered per drink")).toHaveValue(
     "15.00",
   );
-  await page.getByLabel("Traveler name").fill("Jess");
+  await page.getByLabel("Sailor name").fill("Jess");
   await page.getByLabel("Package cost for whole trip").fill("650");
   await page.getByLabel("Extra 1 non-drink value").fill("90");
-  await page
-    .getByRole("button", { name: "Save traveler", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Save sailor", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await page
     .getByRole("button")
@@ -777,7 +767,7 @@ test("drink log combines search with traveler filtering and new travelers inheri
     "100.00",
   );
   await page.getByRole("button", { name: "Close dialog", exact: true }).click();
-  await page.getByRole("button", { name: "Add traveler", exact: true }).click();
+  await page.getByRole("button", { name: "Add sailor", exact: true }).click();
   await expect(
     page.getByText("Package settings copied from Jess. Edit them as needed.", {
       exact: true,
@@ -800,9 +790,9 @@ test("drink log combines search with traveler filtering and new travelers inheri
     .click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await navigate(page, "Overview");
-  await page.getByRole("button", { name: "Add traveler", exact: true }).click();
-  await expect(page.getByLabel("Traveler name")).toHaveValue("");
+  await page.getByRole("button", { name: "Add sailor", exact: true }).click();
+  await expect(page.getByLabel("Sailor name")).toHaveValue("");
   await expect(
-    page.getByLabel("This traveler has a drink package"),
+    page.getByLabel("This sailor has a drink package"),
   ).not.toBeChecked();
 });

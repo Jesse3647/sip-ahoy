@@ -29,6 +29,7 @@ type TravelerFormProps = {
   busy: boolean;
   /** Receives the form result; the parent validates the journal, persists it, and closes the dialog. */
   onSave: (t: Traveler) => void;
+  onDelete?: () => void;
 };
 
 /** Edits one traveler or creates an independent copy of the previous traveler’s package settings. */
@@ -39,6 +40,7 @@ export function TravelerForm({
   sailing,
   busy,
   onSave,
+  onDelete,
 }: TravelerFormProps) {
   // Defaults seed package values only; name, ID, and avatar below belong to the new traveler.
   const template = existing ?? defaults;
@@ -87,7 +89,7 @@ export function TravelerForm({
           Package settings copied from {defaults.name}. Edit them as needed.
         </p>
       )}
-      <Field label="Traveler name">
+      <Field label="Sailor name">
         <input
           name="name"
           required
@@ -120,8 +122,8 @@ export function TravelerForm({
           ))}
         </div>
         <p className="footnote">
-          Your character reacts to your logs for each day. You can change
-          characters anytime.
+          Your character reacts to your recent logs. You can change characters
+          anytime.
         </p>
       </fieldset>
       <label className="check-field">
@@ -130,7 +132,7 @@ export function TravelerForm({
           checked={hasPackage}
           onChange={(e) => setHasPackage(e.target.checked)}
         />
-        <span>This traveler has a drink package</span>
+        <span>This sailor has a drink package</span>
       </label>
       {hasPackage && (
         <>
@@ -158,8 +160,18 @@ export function TravelerForm({
         </>
       )}
       <button className="button primary full" disabled={busy}>
-        Save traveler <Check size={16} />
+        Save sailor <Check size={16} />
       </button>
+      {existing && onDelete && (
+        <button
+          type="button"
+          className="button secondary full delete-sailor"
+          disabled={busy}
+          onClick={onDelete}
+        >
+          Delete sailor
+        </button>
+      )}
     </form>
   );
 }

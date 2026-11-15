@@ -248,7 +248,7 @@ export function PackagePricingEditor({
     <section className="pricing-editor" aria-label="Package pricing">
       <h3 className="form-subtitle">1. What did you pay?</h3>
       <p className="footnote">
-        Amounts are for this traveler only. Use your booking confirmation or
+        Amounts are for this sailor only. Use your booking confirmation or
         receipt.
       </p>
       <label className="field">
@@ -342,7 +342,7 @@ export function PackagePricingEditor({
       <h3 className="form-subtitle">3. Does the bundle include extras?</h3>
       <p className="footnote">
         Subtract the amount you assign to admission or other non-drink benefits.
-        These are whole-trip deductions for this traveler, after gratuities and
+        These are whole-trip deductions for this sailor, after gratuities and
         fees.
       </p>
       <div className="extra-shortcuts">

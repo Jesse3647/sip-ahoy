@@ -73,7 +73,7 @@ export function DrinkPicker({
         <div className="recent-drinks">
           <div className="picker-label">
             <Clock3 size={14} />
-            <strong>Recent for this traveler</strong>
+            <strong>Recent for this sailor</strong>
           </div>
           <div className="recent-chips">
             {recent.map((e) => {

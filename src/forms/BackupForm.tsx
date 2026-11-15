@@ -21,7 +21,7 @@ export function BackupForm({ data, busy, onRestore }: BackupFormProps) {
     <div className="backup-form">
       <p>
         Keep a copy of your whole journal before changing devices. Backups
-        include all sailings, travelers, menus, and logs.
+        include all sailings, sailors, menus, and logs.
       </p>
       <button
         className="button primary full"
@@ -77,7 +77,7 @@ export function BackupForm({ data, busy, onRestore }: BackupFormProps) {
           <strong>Backup ready to restore</strong>
           <p>
             {pending.sailings.length} sailings · {pending.travelers.length}{" "}
-            travelers · {pending.entries.length} drinks
+            sailors · {pending.entries.length} drinks
           </p>
           <p>
             This will replace {data.sailings.length} sailings and{" "}

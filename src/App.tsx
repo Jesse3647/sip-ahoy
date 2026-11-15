@@ -31,6 +31,7 @@ import {
   days,
   demoData,
   removeSailing,
+  removeSailor,
   emptyData,
   money,
   shipCatalog,
@@ -100,7 +101,6 @@ const icons: Record<Page, typeof Anchor> = {
 /** Coordinates journal loading/saving, sailing-scoped views, navigation, and editor lifecycles. */
 export default function App() {
   usePreventPullToRefresh();
-  const openingScene = useOpeningScene();
   const installation = useInstallApp();
   const [snapshot, setSnapshot] = useState<Snapshot>({
     revision: 0,
@@ -111,6 +111,9 @@ export default function App() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [page, setPage] = useState<Page>("Overview");
+  const openingScene = useOpeningScene(
+    `${page}:${snapshot.data.activeSailingId ?? ""}`,
+  );
   const [menuOpen, setMenuOpen] = useState(false);
   const [sailingPickerOpen, setSailingPickerOpen] = useState(false);
   const [modal, setModal] = useState<Modal>(null);
@@ -516,7 +519,7 @@ export default function App() {
                         ? "Review, repeat, or edit logged drinks."
                         : page === "Menus & prices"
                           ? "Search community menus and update your prices."
-                          : "Manage sailings, travelers, and drink packages."}
+                          : "Manage sailings, sailors, and drink packages."}
               </p>
             </div>
             {sailing && (page === "Overview" || page === "Drink log") && (
@@ -542,7 +545,7 @@ export default function App() {
               </div>
               <h2>Create a sailing</h2>
               <p>
-                Add your ship, sailing dates, and travelers to start logging
+                Add your ship, sailing dates, and sailors to start logging
                 drinks.
               </p>
               <button
@@ -587,7 +590,7 @@ export default function App() {
                   ).length;
                   if (
                     !confirm(
-                      `Delete “${trip.name}”? This permanently deletes its ${logs} drink logs and ${travelers} travelers. Other sailings are kept. This cannot be undone; export a backup first if you want to keep a copy.`,
+                      `Delete “${trip.name}”? This permanently deletes its ${logs} drink logs and ${travelers} sailors. Other sailings are kept. This cannot be undone; export a backup first if you want to keep a copy.`,
                     )
                   )
                     return false;
@@ -603,11 +606,11 @@ export default function App() {
                 }
                 onNew={() => setModal({ type: "sailing" })}
               />
-              {crew.length === 0 && (
+              {crew.length === 0 && page !== "Sailing & crew" && (
                 <div className="banner">
-                  Add your first traveler to start logging.{" "}
+                  Add your first sailor to start logging.{" "}
                   <button onClick={() => setModal({ type: "traveler" })}>
-                    Add traveler
+                    Add sailor
                   </button>
                 </div>
               )}
@@ -645,7 +648,7 @@ export default function App() {
                         </div>
                         <span>
                           {crew.length}{" "}
-                          {crew.length === 1 ? "traveler" : "travelers"} ·{" "}
+                          {crew.length === 1 ? "sailor" : "sailors"} ·{" "}
                           {days(sailing)} calendar days
                         </span>
                       </div>
@@ -801,11 +804,11 @@ export default function App() {
                       />
                     </div>
                     <select
-                      aria-label="Filter by traveler"
+                      aria-label="Filter by sailor"
                       value={filter}
                       onChange={(e) => setFilter(e.target.value)}
                     >
-                      <option value="all">All travelers</option>
+                      <option value="all">All sailors</option>
                       {crew.map((t) => (
                         <option key={t.id} value={t.id}>
                           {t.name}
@@ -1104,22 +1107,17 @@ export default function App() {
                   </section>
                   <div className="section-heading">
                     <div>
-                      <h2>Travelers</h2>
+                      <h2>Sailors</h2>
                       <p className="muted">
-                        Manage each traveler’s drink package and costs.
+                        Manage each sailor’s drink package and costs.
                       </p>
                     </div>
                     <button
                       className="button secondary"
                       onClick={() => setModal({ type: "traveler" })}
                     >
-                      <Plus size={16} /> Add traveler
+                      <Plus size={16} /> Add sailor
                     </button>
-                  </div>
-                  <div className="crew-day-control">
-                    <p className="footnote">
-                      Live six-hour reactions, not an intoxication estimate.
-                    </p>
                   </div>
                   <div className="crew-grid">
                     {crew.map((t) => {
@@ -1157,7 +1155,7 @@ export default function App() {
                             <strong>{money(stats.retail)} menu value</strong>
                           </div>
                           <small>
-                            Edit traveler & package <ArrowRight size={12} />
+                            Edit sailor & package <ArrowRight size={12} />
                           </small>
                         </button>
                       );
@@ -1365,8 +1363,8 @@ export default function App() {
                 : "Create sailing"
               : modal.type === "traveler"
                 ? modal.traveler
-                  ? "Edit traveler"
-                  : "Add traveler"
+                  ? "Edit sailor"
+                  : "Add sailor"
                 : modal.type === "log"
                   ? modal.entry
                     ? "Edit drink log"
@@ -1435,6 +1433,34 @@ export default function App() {
           {modal.type === "traveler" && sailing && (
             <TravelerForm
               existing={modal.traveler}
+              onDelete={
+                modal.traveler
+                  ? async () => {
+                      const sailor = modal.traveler!;
+                      const count = data.entries.filter(
+                        (entry) => entry.travelerId === sailor.id,
+                      ).length;
+                      if (
+                        busy ||
+                        fatal ||
+                        !confirm(
+                          `Delete “${sailor.name}”? This permanently deletes this sailor and their ${count} drink logs. This cannot be undone.`,
+                        )
+                      )
+                        return;
+                      if (
+                        await commit(
+                          removeSailor(data, sailor.id),
+                          "Sailor deleted",
+                        )
+                      ) {
+                        if (selectedSailorId === sailor.id)
+                          setSelectedSailorId(null);
+                        if (filter === sailor.id) setFilter("all");
+                      }
+                    }
+                  : undefined
+              }
               defaults={modal.traveler ? undefined : crew.at(-1)}
               defaultCharacter={
                 characterIds.find(
@@ -1451,7 +1477,7 @@ export default function App() {
                       ? data.travelers.map((x) => (x.id === t.id ? t : x))
                       : [...data.travelers, t],
                   },
-                  "Traveler saved",
+                  "Sailor saved",
                 )
               }
             />

@@ -95,6 +95,20 @@ This README is the project ledger. Update the milestone checkboxes and progress 
 
 ## Progress log
 
+### 2026-11-14 — Random scenes after an hour since the last change
+
+- Scene selection is now random, including the first visit. Navigation between screens/sailings, relaunch, or foreground resume chooses a different scene once an hour has elapsed since the last actual change. Quick navigation/reopening preserves the timestamp rather than postponing rotation indefinitely. The current scene remains still until a navigation/open/resume check.
+- Stored last-opened preferences migrate to the last-change timer. Unit coverage exercises all five non-repeating alternatives for every scene, frequent navigation before the hourly boundary, corrupted preferences, and backwards clock changes.
+- Validation: 51 unit tests passed. Twelve focused browser scenarios passed for random navigation/relaunch/resume changes, timer preservation, offline scenes, sailor deletion/cancellation/failed writes, persisted selections, live reactions, and three/four-person midpoint alignment. The updated forms, filters, backups, pricing, and journal workflows also passed their browser checks. Reviewed the 390px three/four-sailor groups and the edit/delete form.
+
+
+### 2026-11-14 — Consistent sailor terminology, deletion, and centered rear portraits
+
+- Replaced traveler wording throughout the interface, accessible labels, package forms, backup summaries, and CSV column headers with sailor/sailors. Existing saved data and JSON backup field names remain compatible. Removed the six-hour reaction disclaimer from the Sailors section of Sailing & crew.
+- Added Delete sailor to the edit dialog with a named confirmation and drink-log count. Successful deletion removes only that sailor and their logs, resets a deleted selection/filter, and leaves the sailing, menus, and other sailors intact. Cancelling or a failed write preserves the sailor and dialog. Deleting the final sailor leaves one clear Add sailor action on the Sailors screen.
+- Tied the rear-left portrait to the mathematical midpoint of the foreground pair in both three- and four-person mobile groups. The rear-right sailor remains to the right of the front-right sailor. Bounds, depth order, and the 48px baseline difference remain intact.
+
+
 ### 2026-11-14 — Grounded mobile sailor group
 
 - Replaced the separated two-by-two rows with a compact, staggered deck grouping. Rear sailors are slightly smaller and centered between the foreground pair, with their baseline only 48px higher and explicit depth layering. Three-person groups use one centered rear sailor. One/two-person and desktop arrangements are unchanged.

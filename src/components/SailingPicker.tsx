@@ -69,9 +69,9 @@ export function SailingPicker({
           }}
         >
           <p className="sailing-picker-intro">
-            Each sailing is a saved session with its own travelers and drink
-            logs. Open a previous trip or start a fresh one; your other sailings
-            stay saved.
+            Each sailing is a saved session with its own sailors and drink logs.
+            Open a previous trip or start a fresh one; your other sailings stay
+            saved.
           </p>
           {error && (
             <div className="banner error" role="alert">

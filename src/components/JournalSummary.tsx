@@ -140,7 +140,7 @@ export function PackageCards({ crew, sailing, entries }: PackageCardsProps) {
           </div>
         );
       })}
-      {!crew.length && <Empty text="Add a traveler to start the comparison." />}
+      {!crew.length && <Empty text="Add a sailor to start the comparison." />}
     </div>
   );
 }

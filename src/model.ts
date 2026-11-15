@@ -224,7 +224,7 @@ export const dataSchema = z
     if (d.activeSailingId && !sailings.has(d.activeSailingId))
       bad("Active sailing is missing");
     for (const t of d.travelers)
-      if (!sailings.has(t.sailingId)) bad("Traveler sailing is missing");
+      if (!sailings.has(t.sailingId)) bad("Sailor sailing is missing");
     for (const t of d.travelers) {
       const sailing = sailings.get(t.sailingId);
       if (t.hasPackage && t.packagePricing && sailing) {
@@ -252,6 +252,16 @@ export const dataSchema = z
   });
 /** Complete persisted journal, inferred from the runtime validation contract. */
 export type Data = z.infer<typeof dataSchema>;
+
+/** Removes a sailor and their logs without changing any other sailor or sailing. */
+export function removeSailor(data: Data, sailorId: string): Data {
+  if (!data.travelers.some((sailor) => sailor.id === sailorId)) return data;
+  return {
+    ...data,
+    travelers: data.travelers.filter((sailor) => sailor.id !== sailorId),
+    entries: data.entries.filter((entry) => entry.travelerId !== sailorId),
+  };
+}
 
 /** Deletes a trip and its private records; retains menus used by another trip on the same ship. */
 export function removeSailing(data: Data, sailingId: string): Data {
@@ -512,7 +522,7 @@ export function csv(data: Data) {
   return [
     [
       "Sailing",
-      "Traveler",
+      "Sailor",
       "Drink",
       "Category",
       "Venue",
